@@ -318,6 +318,7 @@ public class HtmlCleaner {
             byte[] svgBytes = bos.toByteArray();
             byte[] base64Bytes = Base64.getEncoder().encode(svgBytes);
             String svgBase64 = new String(base64Bytes);
+            //TODO: find a better way to remove last 2 invalid strings
             return svgBase64.substring(0, svgBase64.length() - 2);
 
         } catch (IOException e) {

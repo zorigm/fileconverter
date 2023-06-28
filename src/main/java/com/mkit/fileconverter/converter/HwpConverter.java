@@ -36,7 +36,7 @@ public class HwpConverter implements Converter {
     try {
         process.waitFor();
 
-         HtmlCleaner.replaceImgTags(ConverterConstants.HWP_ROOT_CONVERTED_FILE_LOCATION, "hwp");
+        HtmlCleaner.replaceImgTags(ConverterConstants.HWP_ROOT_CONVERTED_FILE_LOCATION, "hwp");
     } catch (InterruptedException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
