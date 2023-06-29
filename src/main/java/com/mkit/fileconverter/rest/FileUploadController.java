@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mkit.fileconverter.converter.ConverterConstants;
+import com.mkit.fileconverter.manager.FileVersionManager;
 import com.mkit.fileconverter.service.FileCompressionService;
 import com.mkit.fileconverter.service.FileConverterService;
 import com.mkit.fileconverter.service.FileUploaderService;
+import com.mkit.fileconverter.util.FileTypeUtils;
 
 import ch.qos.logback.classic.Logger;
 import jakarta.servlet.http.HttpServletResponse;
@@ -57,15 +59,15 @@ public class FileUploadController {
 		}
 
 		try {
-            fileUploaderService.uploadFile(originalFileName, file.getBytes());
+            int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName));
 
-            fileConverterService.convertUploadedFileUsingFactory(originalFileName);
+            fileUploaderService.uploadFile(originalFileName, file.getBytes(), fileIndex);
 
-            fileCompressionService.compressFile(originalFileName);
+            fileConverterService.convertUploadedFileUsingFactory(originalFileName, fileIndex);
 
-            String html = fileCompressionService.retreiveRootHmtl(originalFileName);
+            //fileCompressionService.compressFile(originalFileName);
 
-            //html = ConverterConstants.TEMP_LOCATION + "   " + ConverterConstants.CONVERTED_DOC_FOLDER_LOCATION;
+            String html = fileCompressionService.retrieveRootHtml(originalFileName, fileIndex);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Access-Control-Allow-Private-Network", "false");
@@ -73,8 +75,8 @@ public class FileUploadController {
 
             return new ResponseEntity<String>(html, headers, 200);
 		} catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<String>("NONE", null, 500);
-			//e.printStackTrace();
 		}
 
         //return new ResponseEntity<String>("WRONG", null, 200);

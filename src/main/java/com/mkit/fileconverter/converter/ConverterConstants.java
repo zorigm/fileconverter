@@ -5,6 +5,7 @@ import com.mkit.fileconverter.util.OsUtils;
 public final class ConverterConstants {
     //TODO: Initialize temp folder
     public static final String BACKSLASH = "/";
+    public static final String DASH = "-";
     public static final Enum OS_ENUM = OsUtils.getOS();
     public static final String TEMP_LOCATION = OS_ENUM.equals(OsUtils.OS.WINDOWS) ? System.getProperty("java.io.tmpdir") : System.getProperty("java.io.tmpdir") + BACKSLASH;
 
@@ -65,6 +66,8 @@ public final class ConverterConstants {
 
     public static final String CONVERTED_PDF_FOLDER_NAME = "pdf-folder";
     public static final String CONVERTED_PDF_FOLDER_LOCATION = CONVERTER_FOLDER_LOCATION + BACKSLASH + CONVERTED_PDF_FOLDER_NAME;
+    public static final String CONVERTED_PDF_INDEXED_FOLDER_NAME = "pdf";
+    public static final String CONVERTED_PDF_INDEXED_FOLDER_LOCATION = CONVERTED_PDF_FOLDER_LOCATION + BACKSLASH + CONVERTED_PDF_INDEXED_FOLDER_NAME;
     public static final String PDF_TEMP_FILE_NAME_WITHOUT_EXTENSION = "placeholder-pdf";
     public static final String PDF_TEMP_FILE_NAME = PDF_TEMP_FILE_NAME_WITHOUT_EXTENSION + HTML_EXTENSION;
     public static final String PDF_CONVERTED_FILE_LOCATION = CONVERTED_PDF_FOLDER_LOCATION + BACKSLASH + PDF_TEMP_FILE_NAME;

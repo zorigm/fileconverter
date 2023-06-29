@@ -4,5 +4,5 @@ import java.io.IOException;
 
 public interface Converter {
 
-    String convertToHtml(String uploadedFileLocation) throws IOException;
+    String convertToHtml(String uploadedFileLocation, int fileIndex) throws IOException;
 }

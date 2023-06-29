@@ -20,11 +20,11 @@ import jakarta.servlet.ServletOutputStream;
 @Service
 public class FileCompressionService {
 
-    public String retreiveRootHmtl(String file)
+    public String retrieveRootHtml(String file, int index)
     {
         String fileType = FileTypeUtils.getFileType(file);
-        String rootHtmlLocation = FileTypeUtils.getRootHtml(fileType);
-        String rootStyleLocation = FileTypeUtils.getRootStylesLocation(fileType);
+        String rootHtmlLocation = FileTypeUtils.getConvertedFileLocation(fileType, index);
+        String rootStyleLocation = FileTypeUtils.getRootStylesLocation(fileType, index);
         String rootHtml = getStringFromHtmlFile(rootHtmlLocation);
 
         if(rootStyleLocation == null)

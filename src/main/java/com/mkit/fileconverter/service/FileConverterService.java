@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.mkit.fileconverter.converter.Converter;
 import com.mkit.fileconverter.converter.ConverterFactory;
+import com.mkit.fileconverter.manager.FileVersionManager;
 import com.mkit.fileconverter.util.FileTypeUtils;
 
 
@@ -21,10 +22,12 @@ public class FileConverterService {
         Converter chosenConverter = ConverterFactory.getConverter(fileType)
         .orElseThrow(() -> new IllegalArgumentException("Invalid file type!"));
 
-        return chosenConverter.convertToHtml(filePath + fileName);
+        int fileIndex = FileVersionManager.getNextAvailableIndex(fileType);
+
+        return chosenConverter.convertToHtml(filePath + fileName, fileIndex);
     }
 
-    public String convertUploadedFileUsingFactory(String fileName) throws IOException
+    public String convertUploadedFileUsingFactory(String fileName, int fileIndex) throws IOException
     {
         //validations
         //get fileType
@@ -34,10 +37,10 @@ public class FileConverterService {
 
         Converter chosenConverter = ConverterFactory.getConverter(fileType)
         .orElseThrow(() -> new IllegalArgumentException("Invalid file type!"));
+        
+        String uploadedFileLocation = FileTypeUtils.getUploadedFileLocation(fileType, fileIndex);
 
-        String uploadedFileLocation = FileTypeUtils.getUploadedFileLocation(fileType); 
-
-        return chosenConverter.convertToHtml(uploadedFileLocation);
+        return chosenConverter.convertToHtml(uploadedFileLocation, fileIndex);
     }
 
 }

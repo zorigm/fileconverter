@@ -12,7 +12,7 @@ import com.mkit.fileconverter.util.HtmlCleaner;
 public class DocConverter implements Converter {
 
     @Override
-    public String convertToHtml(String uploadedFileLocation) throws IOException {
+    public String convertToHtml(String uploadedFileLocation, int fileIndex) throws IOException {
         try {
             FileUtils.cleanDirectory(new File(ConverterConstants.CONVERTED_DOC_FOLDER_LOCATION));
             Document doc = new Document(uploadedFileLocation);

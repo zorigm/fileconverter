@@ -11,7 +11,7 @@ import com.mkit.fileconverter.util.HtmlCleaner;
 public class XlsConverter implements Converter {
 
     @Override
-    public String convertToHtml(String uploadedFileLocation) throws IOException {
+    public String convertToHtml(String uploadedFileLocation, int fileIndex) throws IOException {
 
         try {
             FileUtils.deleteDirectory(new File(ConverterConstants.XLS_TEMP_FOLDER_LOCATION));

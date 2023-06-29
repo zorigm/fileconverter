@@ -14,7 +14,7 @@ import com.mkit.fileconverter.util.HtmlCleaner;
 public class HwpConverter implements Converter {
 
     @Override
-    public String convertToHtml(String uploadedFileLocation) throws IOException {
+    public String convertToHtml(String uploadedFileLocation, int fileIndex) throws IOException {
 
         //This needs to call a python script
         //This python script needs to be bundled together

@@ -8,16 +8,23 @@ import java.io.Writer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.fit.pdfdom.PDFDomTree;
 
+import com.mkit.fileconverter.manager.FileVersionManager;
+import com.mkit.fileconverter.util.FileTypeUtils;
+
 public class PdfConverter implements Converter {
 
     @Override
-    public String convertToHtml(String uploadedFileLocation) throws IOException {
+    public String convertToHtml(String uploadedFileLocation, int fileIndex) throws IOException {
+        String convertedFileLocation = FileTypeUtils.getConvertedFileLocation("pdf", fileIndex);
+        String convertedPdfIndexedFolderLocation = FileTypeUtils.getIndexedFolderLocation("pdf", fileIndex);
+        FileVersionManager.createDirectory(convertedPdfIndexedFolderLocation);
         
         PDDocument pdf = PDDocument.load(new File(uploadedFileLocation));
-        Writer output = new PrintWriter(ConverterConstants.PDF_CONVERTED_FILE_LOCATION, "utf-8");
+        Writer output = new PrintWriter(convertedFileLocation, "utf-8");
         
         PDFDomTree pdfDomTree = new PDFDomTree();
         pdfDomTree.writeText(pdf, output);
+        pdf.close();
         output.close();
 
         return "DONE";
