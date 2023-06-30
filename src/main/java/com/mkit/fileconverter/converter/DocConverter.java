@@ -19,7 +19,7 @@ public class DocConverter implements Converter {
             String convertedDocIndexedFolderLocation = FileTypeUtils.getIndexedFolderLocation(fileType, fileIndex);
 
             Files.createDirectory(Path.of(convertedDocIndexedFolderLocation));
-
+            
             Document doc = new Document(uploadedFileLocation);
             doc.save(convertedFileLocation);
 

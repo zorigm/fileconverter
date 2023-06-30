@@ -53,6 +53,9 @@ public final class ConverterConstants {
 
     public static final String CONVERTED_EXCEL_FOLDER_NAME = "excel-folder";
     public static final String CONVERTED_EXCEL_LOCATION = CONVERTER_FOLDER_LOCATION + BACKSLASH + CONVERTED_EXCEL_FOLDER_NAME;
+    public static final String CONVERTED_EXCEL_INDEXED_FOLDER_NAME = "excel";
+    public static final String CONVERTED_EXCEL_INDEXED_FOLDER_LOCATION = CONVERTED_EXCEL_LOCATION + BACKSLASH + CONVERTED_EXCEL_INDEXED_FOLDER_NAME;
+
     public static final String XLS_TEMP_FILE_NAME_WITHOUT_EXTENSTION = "placeholder-excel";
     public static final String XLS_TEMP_FILE_NAME = XLS_TEMP_FILE_NAME_WITHOUT_EXTENSTION + HTML_EXTENSION;
     public static final String XLS_TEMP_FOLDER_NAME = XLS_TEMP_FILE_NAME_WITHOUT_EXTENSTION + "_files";

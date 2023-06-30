@@ -3,9 +3,11 @@ package com.mkit.fileconverter.service;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.mkit.fileconverter.converter.ConverterConstants;
 import com.mkit.fileconverter.util.FileTypeUtils;
+import com.mkit.fileconverter.util.ZipUtility;
 
 import jakarta.servlet.ServletOutputStream;
 
@@ -37,11 +40,11 @@ public class FileCompressionService {
         return combineRootStyleAndRootHtml(rootHtml, rootStyle);
     }
 
-    public String getCompressedFile(String file, ServletOutputStream servletOutputStream) throws IOException
+    public String getCompressedFile(String file, int index, ServletOutputStream servletOutputStream) throws IOException
     {
         String fileType = FileTypeUtils.getFileType(file);
-        String zipLocation = FileTypeUtils.getZipLocation(fileType);
-        String zippedFolderLocation = ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + zipLocation + ConverterConstants.ZIP_EXTENSION;
+        String zipFileName = FileTypeUtils.getIndexedZipFileName(fileType, index);
+        String zippedFolderLocation = ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + zipFileName + ConverterConstants.ZIP_EXTENSION;
         
         ZipOutputStream zipOutputStream = new ZipOutputStream(servletOutputStream);
         zipOutputStream.putNextEntry(new ZipEntry(zippedFolderLocation));
@@ -52,23 +55,33 @@ public class FileCompressionService {
         fileInputStream.close();
         zipOutputStream.closeEntry();
 
-        return zipLocation;
+        return zipFileName;
     }
     
-    public String compressFile(String file) throws IOException
+    public String compressFile(String file, int index) throws IOException
     {
         String fileType = FileTypeUtils.getFileType(file);
-        String sourceFile = FileTypeUtils.getDirectoryToZip(fileType);
-        String zipLocation = FileTypeUtils.getZipLocation(fileType);
+        String sourceFile = FileTypeUtils.getDirectoryToZip(fileType, index);
+        String zipFileName = FileTypeUtils.getIndexedZipFileName(fileType, index);
 
-        FileOutputStream fos = new FileOutputStream(ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + zipLocation + ConverterConstants.ZIP_EXTENSION);
-        ZipOutputStream zipOut = new ZipOutputStream(fos);
+        // FileOutputStream fos = new FileOutputStream(ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + zipFileName + ConverterConstants.ZIP_EXTENSION);
+        // ZipOutputStream zipOut = new ZipOutputStream(fos);
 
-        File fileToZip = new File(sourceFile);
-        zipFile(fileToZip, fileToZip.getName(), zipOut);
-        zipOut.close();
-        fos.close();
-        return zipLocation;
+        // File fileToZip = new File(sourceFile);
+        // zipFile(fileToZip, fileToZip.getName(), zipOut);
+        // zipOut.close();
+        // fos.close();
+
+        zipDirectory(sourceFile, zipFileName);
+
+        return zipFileName;
+    }
+
+    private void zipDirectory(String fileToZip, String zipFileName) throws FileNotFoundException, IOException
+    {
+        ZipUtility zipUtility = new ZipUtility();
+
+        zipUtility.zip(Collections.singletonList(new File(fileToZip)), ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + zipFileName + ConverterConstants.ZIP_EXTENSION);
     }
 
     private void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException

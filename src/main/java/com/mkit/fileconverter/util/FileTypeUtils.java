@@ -9,7 +9,7 @@ import com.mkit.fileconverter.converter.ConverterConstants;
 
 public class FileTypeUtils {
     //private static final Map<String, String> uploadedFileLocations = new HashMap<>();
-    private static final Map<String, String> zipLocations = new HashMap<>();
+    private static final Map<String, String> zipFileNames = new HashMap<>();
     private static final Map<String, String> directoryToCompress = new HashMap<>();
     private static final Map<String, String> rootHtmlLocations = new HashMap<>();
     private static final Map<String, String> rootStylesLocations = new HashMap<>();
@@ -31,28 +31,28 @@ public class FileTypeUtils {
         // uploadedFileLocations.put("xls", ConverterConstants.UPLOADED_XLS_FILE_LOCATION);
         // uploadedFileLocations.put("xlsx", ConverterConstants.UPLOADED_XLSX_FILE_LOCATION);
 
-        zipLocations.put("xls", ConverterConstants.XLS_TEMP_FILE_NAME_WITHOUT_EXTENSTION);
-        zipLocations.put("xlsx", ConverterConstants.XLS_TEMP_FILE_NAME_WITHOUT_EXTENSTION);
+        zipFileNames.put("xls", ConverterConstants.XLS_TEMP_FILE_NAME_WITHOUT_EXTENSTION);
+        zipFileNames.put("xlsx", ConverterConstants.XLS_TEMP_FILE_NAME_WITHOUT_EXTENSTION);
 
-        zipLocations.put("doc", ConverterConstants.DOC_TEMP_FILE_NAME_WITHOUT_EXTENSION);
-        zipLocations.put("docx", ConverterConstants.DOC_TEMP_FILE_NAME_WITHOUT_EXTENSION);
+        // zipLocations.put("doc", ConverterConstants.DOC_TEMP_FILE_NAME_WITHOUT_EXTENSION);
+        // zipLocations.put("docx", ConverterConstants.DOC_TEMP_FILE_NAME_WITHOUT_EXTENSION);
 
-        zipLocations.put("pdf", ConverterConstants.PDF_TEMP_FILE_NAME_WITHOUT_EXTENSION);
+        // zipLocations.put("pdf", ConverterConstants.PDF_TEMP_FILE_NAME_WITHOUT_EXTENSION);
 
-        zipLocations.put("hwp", ConverterConstants.HWP_TEMP_FOLDER_NAME);
-        zipLocations.put("hwpx", ConverterConstants.HWP_TEMP_FOLDER_NAME);
+        // zipLocations.put("hwp", ConverterConstants.HWP_TEMP_FOLDER_NAME);
+        // zipLocations.put("hwpx", ConverterConstants.HWP_TEMP_FOLDER_NAME);
 
 
         directoryToCompress.put("xls", ConverterConstants.CONVERTED_EXCEL_LOCATION);
         directoryToCompress.put("xlsx", ConverterConstants.CONVERTED_EXCEL_LOCATION);
 
-        directoryToCompress.put("doc", ConverterConstants.CONVERTED_DOC_FOLDER_LOCATION);
-        directoryToCompress.put("docx", ConverterConstants.CONVERTED_DOC_FOLDER_LOCATION);
+        // directoryToCompress.put("doc", ConverterConstants.CONVERTED_DOC_FOLDER_LOCATION);
+        // directoryToCompress.put("docx", ConverterConstants.CONVERTED_DOC_FOLDER_LOCATION);
 
-        directoryToCompress.put("pdf", ConverterConstants.CONVERTED_PDF_FOLDER_LOCATION);
+        // directoryToCompress.put("pdf", ConverterConstants.CONVERTED_PDF_FOLDER_LOCATION);
 
-        directoryToCompress.put("hwp", ConverterConstants.CONVERTED_HWP_FOLDER_LOCATION);
-        directoryToCompress.put("hwpx", ConverterConstants.CONVERTED_HWP_FOLDER_LOCATION);
+        // directoryToCompress.put("hwp", ConverterConstants.CONVERTED_HWP_FOLDER_LOCATION);
+        // directoryToCompress.put("hwpx", ConverterConstants.CONVERTED_HWP_FOLDER_LOCATION);
 
 
         rootHtmlLocations.put("pdf", ConverterConstants.PDF_CONVERTED_FILE_LOCATION);
@@ -79,8 +79,8 @@ public class FileTypeUtils {
 
         indexedFolderLocations.put("pdf", ConverterConstants.CONVERTED_PDF_INDEXED_FOLDER_LOCATION);
 
-        indexedFolderLocations.put("xls", null);
-        indexedFolderLocations.put("xlsx", null);
+        indexedFolderLocations.put("xls", ConverterConstants.CONVERTED_EXCEL_INDEXED_FOLDER_LOCATION);
+        indexedFolderLocations.put("xlsx", ConverterConstants.CONVERTED_EXCEL_INDEXED_FOLDER_LOCATION);
 
         indexedFolderLocations.put("doc", ConverterConstants.CONVERTED_DOC_INDEXED_FOLDER_LOCATION);
         indexedFolderLocations.put("docx", ConverterConstants.CONVERTED_DOC_INDEXED_FOLDER_LOCATION);
@@ -94,8 +94,8 @@ public class FileTypeUtils {
         convertedFileNames.put("doc", ConverterConstants.DOC_TEMP_FILE_NAME);
         convertedFileNames.put("docx", ConverterConstants.DOC_TEMP_FILE_NAME);
 
-        convertedFileNames.put("xls", null);
-        convertedFileNames.put("xlsx", null);
+        convertedFileNames.put("xls", ConverterConstants.XLS_TEMP_FILE_NAME);
+        convertedFileNames.put("xlsx", ConverterConstants.XLS_TEMP_FILE_NAME);
 
         convertedFileNames.put("hwp", ConverterConstants.HWP_ROOT_CONVERTED_FILE_NAME);
         convertedFileNames.put("hwpx", null);
@@ -106,8 +106,8 @@ public class FileTypeUtils {
         uploadedFileNames.put("doc", ConverterConstants.UPLOADED_DOC_FILE_NAME_WITHOUT_EXTENSION);
         uploadedFileNames.put("docx", ConverterConstants.UPLOADED_DOC_FILE_NAME_WITHOUT_EXTENSION);
 
-        uploadedFileNames.put("xls", null);
-        uploadedFileNames.put("xlsx", null);
+        uploadedFileNames.put("xls", ConverterConstants.UPLOADED_XLS_FILE_NAME_WITHOUT_EXTENSION);
+        uploadedFileNames.put("xlsx", ConverterConstants.UPLOADED_XLS_FILE_NAME_WITHOUT_EXTENSION);
 
         uploadedFileNames.put("hwp", ConverterConstants.UPLOADED_HWP_FILE_NAME_WITHOUT_EXTENSION);
         uploadedFileNames.put("hwpx", ConverterConstants.UPLOADED_HWP_FILE_NAME_WITHOUT_EXTENSION);
@@ -146,21 +146,22 @@ public class FileTypeUtils {
         return ConverterConstants.TEMP_UPLOADED_FILE_LOCATION + ConverterConstants.BACKSLASH + fileName + ConverterConstants.DASH + index + fileExtension;
     }
 
-    public static String getZipLocation(String fileType)
+    public static String getIndexedZipFileName(String fileType, int index)
     {
         //TODO: validate fileType
 
-        String zipLocation = zipLocations.get(fileType);
+        String zipFileName = zipFileNames.get(fileType);
 
-        //TODO: validate ziplocation and exception handling
-        return zipLocation;
+        //TODO: validate zipFileName and exception handling
+        return zipFileName + ConverterConstants.DASH + index;
     }
 
-    public static String getDirectoryToZip(String fileType)
+    public static String getDirectoryToZip(String fileType, int index)
     {
         //TODO: validate file type
 
-         String directoryToZip = directoryToCompress.get(fileType);
+         String directoryToZip = getIndexedFolderLocation(fileType, index);
+
 
          //TODO: validate directoryToZip and exception handling
 
