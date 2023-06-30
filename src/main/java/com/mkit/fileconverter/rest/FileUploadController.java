@@ -1,7 +1,10 @@
 package com.mkit.fileconverter.rest;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -50,7 +53,7 @@ public class FileUploadController {
 
     
     @PostMapping(value = "/upload")
-    public ResponseEntity<String> convertUploadedFile(@RequestPart("file") MultipartFile file) throws IOException
+    public ResponseEntity<Object> convertUploadedFile(@RequestPart("file") MultipartFile file) throws IOException
     {
         String originalFileName = file.getOriginalFilename();
         if (null == originalFileName)
@@ -72,11 +75,20 @@ public class FileUploadController {
             HttpHeaders headers = new HttpHeaders();
             headers.add("Access-Control-Allow-Private-Network", "false");
             headers.add("Access-Control-Allow-Origin", "*");
+            
+            String convertedString = StringEscapeUtils.escapeHtml4(html);
+            String fileType = originalFileName.substring(originalFileName.lastIndexOf(".")).replace(".","");
+            String fileName = originalFileName.substring(0,originalFileName.lastIndexOf(".")).replace(".","");
 
-            return new ResponseEntity<String>(html, headers, 200);
+             Map<String, Object> map = new HashMap<String, Object>();
+            map.put("index", fileName);
+            map.put("fileType", fileType);
+            map.put("html", convertedString);
+        
+            return new ResponseEntity<Object>(map, headers, 200);
 		} catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<String>("NONE", null, 500);
+            return new ResponseEntity<Object>("{'error':'NONE'}", null, 500);
+			//e.printStackTrace();
 		}
 
         //return new ResponseEntity<String>("WRONG", null, 200);

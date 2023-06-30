@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>File to HTML Converter</title>
+  <div id="htmlContainer"></div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script>// Function to handle file selection and conversion
+
+
+    var convertedData = "";
+    var index;
+    var fileType;
+    var html;
+
+
+    function convertFile() {
+      // Get the selected file
+      var fileUpload = document.getElementById('fileUpload');
+      var file = fileUpload.files[0];
+
+
+
+      if (fileUpload.files.length == 0) {
+        /* alert('Please select a HWP, HWPX, DOC, DOCX, XLS, XLSX or PDF file.');*/
+        alert('Please select a HWP,DOC, DOCX, XLS, XLSX or PDF file.');
+        return;
+      }
+      if (file.size >= 26214400) {
+        alert('We allows files up to 25MB.');
+        return;
+      }
+
+      // Validate file type (only HWP, HWPX, DOC, DOCX, XLS, XLSX or PDF allowed)
+      var allowedTypes = ['hwp', 'doc', 'docx', 'pdf', 'xls', 'xlsx',];
+
+      if (!allowedTypes.includes(file.name.substr(file.name.lastIndexOf(".") + 1))) {
+        /*alert('Please select a HWP, HWPX, DOC, DOCX, XLS, XLSX or PDF file.');*/
+        alert('Please select a HWP,DOC, DOCX, XLS, XLSX or PDF file.');
+        return;
+      }
+      var convertedHtmlOutput = document.getElementById('convertedHtmlOutput');
+
+
+      // Create a FormData object to send the file to the server
+      var formData = new FormData();
+      formData.append('file', file);
+
+      // Send a POST request to the server
+      var loadingModal = document.getElementById("loadingModal");
+      var convertedOutput = document.getElementById('convertedTextOutput');
+      var imageContainer = document.getElementById("image-container");
+      loadingModal.style.display = "block";
+      convertedOutput.style.display = "none";
+      convertedHtmlOutput.style.display = "none";
+      imageContainer.style.display = 'block';
+
+      var xhr = new XMLHttpRequest();
+      xhr.timeout = 360000;
+      //xhr.open('POST', 'http://html-converter-zz-env.eba-jabucpgb.us-east-1.elasticbeanstalk.com/file-convert/upload', true);
+      xhr.open('POST', 'http://192.82.66.43:9094/file-convert/upload', true);
+      xhr.onerror = function () {
+        alert("Network error");
+        loadingModal.style.display = "none";
+      };
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          // Display the converted HTML
+
+          convertedData = xhr.response;
+
+          var json = JSON.parse(xhr.response);
+          index = json.index;
+          fileType = json.fileType;
+          html = json.html;
+
+          convertedHtmlOutput.innerHTML = html;
+          convertedData = convertedHtmlOutput.textContent;
+
+          var downloadButton = document.getElementById('downloadButton');
+          var previewButton = document.getElementById('previewButton');
+          var downloadZip = document.getElementById('downloadZip');
+
+
+          convertedOutput.innerText = convertedData;
+          convertedHtmlOutput.innerHTML = convertedData;
+
+          if (file.name.substr(file.name.lastIndexOf(".") + 1) == "doc" || file.name.substr(file.name.lastIndexOf(".") + 1) == "docx") {
+            $("#convertedHtmlOutput>div").css("width", "60%");
+            $("#convertedHtmlOutput>div").css("margin", "auto");
+          }
+
+          if (fileType == "xls" || fileType == "xlsx") {
+            convertedOutput.style.display = "none";
+            convertedHtmlOutput.style.display = "none";
+            downloadButton.style.display = 'none';
+            previewButton.style.display = 'none';
+            imageContainer.style.display = 'block';
+            downloadZip.style.display = "block";
+          }
+          else {
+            convertedOutput.style.display = "block";
+            convertedHtmlOutput.style.display = "none";
+            downloadButton.style.display = 'block';
+            previewButton.style.display = 'block';
+            imageContainer.style.display = 'none';
+            downloadZip.style.display = "none";
+          }
+        } else {
+          alert('Error converting the file. Please try again.');
+        }
+        loadingModal.style.display = "none";
+      };
+      xhr.send(formData);
+
+    }
+
+    // Function to trigger the download of the HTML file
+    function downloadFile() {
+      // Create a temporary link element
+
+      var link = document.createElement('a');
+
+      link.href = 'data:text/html;charset=utf-8,' + encodeURIComponent(convertedHtmlOutput.innerHTML);
+      link.download = 'converted.html';
+
+      // Simulate a click on the link to trigger the download
+      link.click();
+    }
+    function downloadZip() {
+
+      var link = document.createElement('a');
+
+      link.href = 'http://192.82.66.43:9094/file-convert/compress?file=' + index + "." + fileType;
+      link.target = "_blank";
+      // Simulate a click on the link to trigger the download
+      link.click();
+
+      //var xhr = new XMLHttpRequest();
+      //xhr.timeout = 360000;
+      //xhr.open('GET', 'http://localhost:8080/file-convert/compress?file=' + $("#fileUpload")[0].files[0].name, true);
+      //xhr.onload = function () {
+      //  if (xhr.status === 200) {
+      //  } else {
+      //    alert('Error downloading the file. Please try again.');
+      //  }
+      //};
+      //xhr.send();
+
+    }
+    function previewFile() {
+      var convertedOutput = document.getElementById('convertedTextOutput');
+
+      var convertedHtmlOutput = document.getElementById('convertedHtmlOutput');
+      if (convertedOutput.style.display == "block") {
+        convertedOutput.style.display = "none";
+        convertedHtmlOutput.style.display = "block";
+      }
+      else {
+        convertedOutput.style.display = "block";
+        convertedHtmlOutput.style.display = "none";
+      }
+    }
+  </script>
+</head>
+
+
+<body>
+  <h1>
+    <center>Document Converter</center>
+  </h1>
+  <div class="container">
+    <div class="row">
+      <p>
+        <center>This free online tool converts your HWP, DOC, DOCX, XLS, XLSX, PDF files to HTML format. Currently other
+          files is unavailable to convert. We allows files up to 25MB.</center>
+      </p>
+    </div>
+
+    <div class="row document-body">
+      <!-- File input field -->
+      <input type="file" class="form-control-file" name="fileToUpload" id="fileUpload"
+        accept=".hwp, .hwpx, .doc, .docx, .xls, .xlsx, .pdf" />
+      <!-- Convert button -->
+      <button class="btn btn-primary" type="submit" onclick="convertFile()" style="margin-right: 10px;">Convert</button>
+      <button id="downloadButton" onclick="downloadFile()">Download Html</button>
+      <button id="downloadZip" onclick="downloadZip()">Download Zip</button>
+      <button id="previewButton" onclick="previewFile()">Preview</button>
+      </form>
+    </div>
+    <div class="preview-container">
+      <div id="convertedTextOutput"></div>
+      <div id="convertedHtmlOutput"></div>
+    </div>
+    <!-- Raw HTML output -->
+
+    <!-- Download button -->
+  </div>
+  <!-- image -->
+  <div>
+    <center id="image-container"> </center>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const jsonData = {
+          "image": {
+            "mime": "image/jpeg",
+            "data": "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"
+          }
+        };
+        const imageContainer = document.getElementById("image-container");
+        const imageElement = new Image();
+        imageElement.src = "data:" + jsonData.image.mime + ";base64," + jsonData.image.data;
+        imageContainer.appendChild(imageElement);
+      });
+    </script>
+  </div>
+  <div id="loadingModal">
+    <p>Converting, Please wait...</p>
+  </div>
+
+</body>
+<style>
+  #loadingModal {
+    display: none;
+    height: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  #loadingModal p {
+    font-size: 28px;
+    color: white;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    margin: 0px;
+    align-items: center;
+  }
+
+  #convertedHtmlOutput div.page {
+    border-color: black !important;
+  }
+
+  .preview-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .preview-container #convertedTextOutput {
+    display: none;
+    width: 80%;
+    margin-inline: auto;
+    padding: 20px;
+    border: 1px solid black;
+    height: 500px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+
+  .preview-container #convertedHtmlOutput {
+    display: none;
+    width: fit-content;
+  }
+
+  #downloadButton,
+  #downloadZip,
+  #previewButton {
+    display: none;
+    margin-right: 10px;
+  }
+
+  .container .document-body {
+    border: 1px dashed #CCC;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+  }
+</style>
+
+</html>
