@@ -7,19 +7,17 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script>// Function to handle file selection and conversion
 
-
     var convertedData = "";
     var index;
     var fileType;
     var html;
-
+    var apiUrl = 'http://192.82.66.43:9094';
+    apiUrl = 'http://192.168.0.120:8080';
 
     function convertFile() {
       // Get the selected file
       var fileUpload = document.getElementById('fileUpload');
       var file = fileUpload.files[0];
-
-
 
       if (fileUpload.files.length == 0) {
         /* alert('Please select a HWP, HWPX, DOC, DOCX, XLS, XLSX or PDF file.');*/
@@ -32,16 +30,15 @@
       }
 
       // Validate file type (only HWP, HWPX, DOC, DOCX, XLS, XLSX or PDF allowed)
-      var allowedTypes = ['hwp', 'doc', 'docx', 'pdf', 'xls', 'xlsx',];
+      var allowedTypes = ['hwp', 'hwpx', 'doc', 'docx', 'pdf', 'xls', 'xlsx',];
 
       if (!allowedTypes.includes(file.name.substr(file.name.lastIndexOf(".") + 1))) {
         /*alert('Please select a HWP, HWPX, DOC, DOCX, XLS, XLSX or PDF file.');*/
         alert('Please select a HWP,DOC, DOCX, XLS, XLSX or PDF file.');
         return;
       }
+
       var convertedHtmlOutput = document.getElementById('convertedHtmlOutput');
-
-
       // Create a FormData object to send the file to the server
       var formData = new FormData();
       formData.append('file', file);
@@ -57,62 +54,95 @@
 
       var xhr = new XMLHttpRequest();
       xhr.timeout = 360000;
-      //xhr.open('POST', 'http://html-converter-zz-env.eba-jabucpgb.us-east-1.elasticbeanstalk.com/file-convert/upload', true);
-      xhr.open('POST', 'http://192.82.66.43:9094/file-convert/upload', true);
-      xhr.onerror = function () {
-        alert("Network error");
-        loadingModal.style.display = "none";
-      };
-      xhr.onload = function () {
-        if (xhr.status === 200) {
-          // Display the converted HTML
 
-          convertedData = xhr.response;
+      if (file.name.substr(file.name.lastIndexOf(".") + 1) == "xls" || file.name.substr(file.name.lastIndexOf(".") + 1) == "xlsx") {
 
-          var json = JSON.parse(xhr.response);
-          index = json.index;
-          fileType = json.fileType;
-          html = json.html;
-
-          convertedHtmlOutput.innerHTML = html;
-          convertedData = convertedHtmlOutput.textContent;
-
-          var downloadButton = document.getElementById('downloadButton');
-          var previewButton = document.getElementById('previewButton');
-          var downloadZip = document.getElementById('downloadZip');
-
-
-          convertedOutput.innerText = convertedData;
-          convertedHtmlOutput.innerHTML = convertedData;
-
-          if (file.name.substr(file.name.lastIndexOf(".") + 1) == "doc" || file.name.substr(file.name.lastIndexOf(".") + 1) == "docx") {
-            $("#convertedHtmlOutput>div").css("width", "60%");
-            $("#convertedHtmlOutput>div").css("margin", "auto");
+        //$("#loadingModal p").innerText = "Zip File Downloading...";
+        xhr.open('POST', apiUrl + '/file-convert/upload/compressed', true);
+       
+        xhr.responseType = 'arraybuffer';
+        xhr.onerror = function () {
+          alert("Network error");
+          loadingModal.style.display = "none";
+        };
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            const filename = 'file.zip'; // Specify the desired file name
+            const blob = new Blob([xhr.response], { type: 'application/octet-stream' });
+      
+            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+              // For IE browser
+              window.navigator.msSaveOrOpenBlob(blob, filename);
+            } else {
+              const url = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = filename;
+              link.click();
+              window.URL.revokeObjectURL(url);
+            }
+          } else {
+            alert('Error downloading the file. Please try again.');
           }
+          loadingModal.style.display = "none";
+        };
+        xhr.send(formData);
+      }
+      else {
+       // $("#loadingModal p").innerText = "Converting, Please wait...";
 
-          if (fileType == "xls" || fileType == "xlsx") {
-            convertedOutput.style.display = "none";
-            convertedHtmlOutput.style.display = "none";
-            downloadButton.style.display = 'none';
-            previewButton.style.display = 'none';
-            imageContainer.style.display = 'block';
-            downloadZip.style.display = "block";
-          }
-          else {
-            convertedOutput.style.display = "block";
-            convertedHtmlOutput.style.display = "none";
-            downloadButton.style.display = 'block';
-            previewButton.style.display = 'block';
-            imageContainer.style.display = 'none';
-            downloadZip.style.display = "none";
-          }
-        } else {
-          alert('Error converting the file. Please try again.');
-        }
-        loadingModal.style.display = "none";
-      };
-      xhr.send(formData);
+        xhr.open('POST', apiUrl + '/file-convert/upload', true);
+        xhr.onerror = function () {
+          alert("Network error");
+          loadingModal.style.display = "none";
+        };
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            // Display the converted HTML
 
+            convertedData = xhr.response;
+
+            var json = JSON.parse(xhr.response);
+            index = json.index;
+            fileType = json.fileType;
+            html = json.html;
+
+            convertedHtmlOutput.innerHTML = html;
+            convertedData = convertedHtmlOutput.textContent;
+
+            var downloadButton = document.getElementById('downloadButton');
+            var previewButton = document.getElementById('previewButton');
+
+
+            if (fileType == "xls" || fileType == "xlsx") {
+              convertedOutput.style.display = "none";
+              convertedHtmlOutput.style.display = "none";
+              downloadButton.style.display = 'none';
+              previewButton.style.display = 'none';
+              imageContainer.style.display = 'block';
+            }
+            else {
+              convertedOutput.innerText = convertedData;
+              convertedHtmlOutput.innerHTML = convertedData;
+
+              if (file.name.substr(file.name.lastIndexOf(".") + 1) == "doc" || file.name.substr(file.name.lastIndexOf(".") + 1) == "docx") {
+                $("#convertedHtmlOutput>div").css("width", "60%");
+                $("#convertedHtmlOutput>div").css("margin", "auto");
+              }
+
+              convertedOutput.style.display = "block";
+              convertedHtmlOutput.style.display = "none";
+              downloadButton.style.display = 'block';
+              previewButton.style.display = 'block';
+              imageContainer.style.display = 'none';
+            }
+          } else {
+            alert('Error converting the file. Please try again.');
+          }
+          loadingModal.style.display = "none";
+        };
+        xhr.send(formData);
+      }
     }
 
     // Function to trigger the download of the HTML file
@@ -126,27 +156,6 @@
 
       // Simulate a click on the link to trigger the download
       link.click();
-    }
-    function downloadZip() {
-
-      var link = document.createElement('a');
-
-      link.href = 'http://192.82.66.43:9094/file-convert/compress?file=' + index + "." + fileType;
-      link.target = "_blank";
-      // Simulate a click on the link to trigger the download
-      link.click();
-
-      //var xhr = new XMLHttpRequest();
-      //xhr.timeout = 360000;
-      //xhr.open('GET', 'http://localhost:8080/file-convert/compress?file=' + $("#fileUpload")[0].files[0].name, true);
-      //xhr.onload = function () {
-      //  if (xhr.status === 200) {
-      //  } else {
-      //    alert('Error downloading the file. Please try again.');
-      //  }
-      //};
-      //xhr.send();
-
     }
     function previewFile() {
       var convertedOutput = document.getElementById('convertedTextOutput');
@@ -184,7 +193,6 @@
       <!-- Convert button -->
       <button class="btn btn-primary" type="submit" onclick="convertFile()" style="margin-right: 10px;">Convert</button>
       <button id="downloadButton" onclick="downloadFile()">Download Html</button>
-      <button id="downloadZip" onclick="downloadZip()">Download Zip</button>
       <button id="previewButton" onclick="previewFile()">Preview</button>
       </form>
     </div>
@@ -268,7 +276,6 @@
   }
 
   #downloadButton,
-  #downloadZip,
   #previewButton {
     display: none;
     margin-right: 10px;
