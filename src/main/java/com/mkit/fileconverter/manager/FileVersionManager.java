@@ -62,9 +62,15 @@ public class FileVersionManager {
         switch (fileType) {
             case "hwp":
                 return hwpStack;
+            case "hwpx":
+                return hwpStack;    
             case "doc":
                 return doctack;
+            case "docx":
+                return doctack;
             case "xls":
+                return xlstack;
+            case "xlsx":
                 return xlstack;
             case "pdf":
                 return pdfStack;

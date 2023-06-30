@@ -1,12 +1,13 @@
 package com.mkit.fileconverter.converter;
 
 import com.mkit.fileconverter.util.OsUtils;
+import com.mkit.fileconverter.util.OsUtils.OS;
 
 public final class ConverterConstants {
     //TODO: Initialize temp folder
     public static final String BACKSLASH = "/";
     public static final String DASH = "-";
-    public static final Enum OS_ENUM = OsUtils.getOS();
+    public static final OS OS_ENUM = OsUtils.getOS();
     public static final String TEMP_LOCATION = OS_ENUM.equals(OsUtils.OS.WINDOWS) ? System.getProperty("java.io.tmpdir") : System.getProperty("java.io.tmpdir") + BACKSLASH;
 
     public static final String HTML_EXTENSION = ".html";
@@ -60,6 +61,8 @@ public final class ConverterConstants {
 
     public static final String CONVERTED_DOC_FOLDER_NAME = "doc-folder";
     public static final String CONVERTED_DOC_FOLDER_LOCATION = CONVERTER_FOLDER_LOCATION + BACKSLASH + CONVERTED_DOC_FOLDER_NAME;
+    public static final String CONVERTED_DOC_INDEXED_FOLDER_NAME = "doc";
+    public static final String CONVERTED_DOC_INDEXED_FOLDER_LOCATION = CONVERTED_DOC_FOLDER_LOCATION + BACKSLASH + CONVERTED_DOC_INDEXED_FOLDER_NAME;
     public static final String DOC_TEMP_FILE_NAME_WITHOUT_EXTENSION= "placeholder-doc";
     public static final String DOC_TEMP_FILE_NAME = DOC_TEMP_FILE_NAME_WITHOUT_EXTENSION + HTML_EXTENSION;
     public static final String DOC_CONVERTED_FILE_LOCATION = CONVERTED_DOC_FOLDER_LOCATION + BACKSLASH + DOC_TEMP_FILE_NAME;

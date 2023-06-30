@@ -18,14 +18,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mkit.fileconverter.converter.ConverterConstants;
 import com.mkit.fileconverter.manager.FileVersionManager;
 import com.mkit.fileconverter.service.FileCompressionService;
 import com.mkit.fileconverter.service.FileConverterService;
 import com.mkit.fileconverter.service.FileUploaderService;
 import com.mkit.fileconverter.util.FileTypeUtils;
 
-import ch.qos.logback.classic.Logger;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
@@ -78,17 +76,17 @@ public class FileUploadController {
             
             String convertedString = StringEscapeUtils.escapeHtml4(html);
             String fileType = originalFileName.substring(originalFileName.lastIndexOf(".")).replace(".","");
-            String fileName = originalFileName.substring(0,originalFileName.lastIndexOf(".")).replace(".","");
+            //String fileName = originalFileName.substring(0,originalFileName.lastIndexOf(".")).replace(".","");
 
-             Map<String, Object> map = new HashMap<String, Object>();
-            map.put("index", fileName);
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("index", fileIndex);
             map.put("fileType", fileType);
             map.put("html", convertedString);
         
             return new ResponseEntity<Object>(map, headers, 200);
 		} catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<Object>("{'error':'NONE'}", null, 500);
-			//e.printStackTrace();
 		}
 
         //return new ResponseEntity<String>("WRONG", null, 200);

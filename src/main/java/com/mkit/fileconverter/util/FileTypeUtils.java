@@ -68,7 +68,7 @@ public class FileTypeUtils {
 
 
         imageFolderLocations.put("doc", ConverterConstants.CONVERTED_DOC_FOLDER_LOCATION);
-        imageFolderLocations.put("doc", ConverterConstants.CONVERTED_DOC_FOLDER_LOCATION);
+        imageFolderLocations.put("docx", ConverterConstants.CONVERTED_DOC_FOLDER_LOCATION);
 
         imageFolderLocations.put("hwp", ConverterConstants.HWP_IMAGE_FOLDER_LOCATION);
 
@@ -82,35 +82,35 @@ public class FileTypeUtils {
         indexedFolderLocations.put("xls", null);
         indexedFolderLocations.put("xlsx", null);
 
-        indexedFolderLocations.put("doc", null);
-        indexedFolderLocations.put("docx", null);
+        indexedFolderLocations.put("doc", ConverterConstants.CONVERTED_DOC_INDEXED_FOLDER_LOCATION);
+        indexedFolderLocations.put("docx", ConverterConstants.CONVERTED_DOC_INDEXED_FOLDER_LOCATION);
         
-        indexedFolderLocations.put("hwp", null);
-        indexedFolderLocations.put("hwpx", null);
+        indexedFolderLocations.put("hwp", ConverterConstants.HWP_TEMP_FOLDER_LOCATION);
+        indexedFolderLocations.put("hwpx", ConverterConstants.HWP_TEMP_FOLDER_LOCATION);
 
 
         convertedFileNames.put("pdf", ConverterConstants.PDF_TEMP_FILE_NAME);
 
-        convertedFileNames.put("doc", null);
-        convertedFileNames.put("docx", null);
+        convertedFileNames.put("doc", ConverterConstants.DOC_TEMP_FILE_NAME);
+        convertedFileNames.put("docx", ConverterConstants.DOC_TEMP_FILE_NAME);
 
         convertedFileNames.put("xls", null);
         convertedFileNames.put("xlsx", null);
 
-        convertedFileNames.put("hwp", null);
+        convertedFileNames.put("hwp", ConverterConstants.HWP_ROOT_CONVERTED_FILE_NAME);
         convertedFileNames.put("hwpx", null);
 
 
         uploadedFileNames.put("pdf", ConverterConstants.UPLOADED_PDF_FILE_NAME_WITHOUT_EXTENSION);
 
-        uploadedFileNames.put("doc", null);
-        uploadedFileNames.put("docx", null);
+        uploadedFileNames.put("doc", ConverterConstants.UPLOADED_DOC_FILE_NAME_WITHOUT_EXTENSION);
+        uploadedFileNames.put("docx", ConverterConstants.UPLOADED_DOC_FILE_NAME_WITHOUT_EXTENSION);
 
         uploadedFileNames.put("xls", null);
         uploadedFileNames.put("xlsx", null);
 
-        uploadedFileNames.put("hwp", null);
-        uploadedFileNames.put("hwpx", null);
+        uploadedFileNames.put("hwp", ConverterConstants.UPLOADED_HWP_FILE_NAME_WITHOUT_EXTENSION);
+        uploadedFileNames.put("hwpx", ConverterConstants.UPLOADED_HWP_FILE_NAME_WITHOUT_EXTENSION);
 
 
         rootHtmlLocationAfterIndexedPath.put("pdf", null);
@@ -171,18 +171,22 @@ public class FileTypeUtils {
     {
         //TODO: validate file type
 
+        if(fileType.equals("hwp"))
+        {
+            return getIndexedFolderLocation(fileType, index) + ConverterConstants.BACKSLASH + ConverterConstants.HWP_ROOT_STYLES_FILE_NAME;
+        }
+
         String rootStyleLocation = rootStylesLocations.get(fileType);
 
         //TODO: validate rootStyleLocation
 
-        return rootStyleLocation;
+        return null;
     }
 
-    public static String getImagesFolderLocation(String fileType) {
+    public static String getImagesFolderLocation(String fileType, int index) {
         //TODO: validate file type
-
-        String imageFolderLocation = imageFolderLocations.get(fileType);
-
+        
+        String imageFolderLocation = getIndexedFolderLocation(fileType, index);
         //TODO: validate imageFolderLocation
 
         return imageFolderLocation;
@@ -202,7 +206,7 @@ public class FileTypeUtils {
 
         String indexedFolderLocation = indexedFolderLocations.get(fileType);
 
-        //TODO: validate imageFolderLocation
+        //TODO: validate indexedFolderLocation
 
         return indexedFolderLocation + ConverterConstants.DASH + index;
     }

@@ -49,13 +49,13 @@ public class HtmlCleaner {
         removableTexts.add("Evaluation Only. Created with Aspose.Cells for Java.Copyright 2003 - 2023 Aspose Pty Ltd.");
 
         BASE_64_IMAGE_SOURCE_ROOT.put("png", "data:image/png;base64,");
-        BASE_64_IMAGE_SOURCE_ROOT.put("jpeg", "data:image/png;base64,");
+        BASE_64_IMAGE_SOURCE_ROOT.put("jpeg", "data:image/jpg;base64,");
         BASE_64_IMAGE_SOURCE_ROOT.put("svg", "data:image/svg+xml;base64,");
         BASE_64_IMAGE_SOURCE_ROOT.put("bmp", "data:image/bmp;base64,");
         BASE_64_IMAGE_SOURCE_ROOT.put("gif", "data:image/gif;base64,");
     }
 
-    public static void replaceImgTags(String file, String fileType) throws IOException
+    public static void replaceImgTags(String file, String fileType, int index) throws IOException
     {
         Document doc = Jsoup.parse(new File(file));
         Iterator<Element> imgIterator = doc.getElementsByTag("img").iterator();
@@ -67,14 +67,11 @@ public class HtmlCleaner {
 
             String currentImageSource = imgElement.attributes().get("src");
 
-            String folderLocation = FileTypeUtils.getImagesFolderLocation(fileType);
+            String folderLocation = FileTypeUtils.getImagesFolderLocation(fileType, index);
 
             String imageSourceFileLocation = folderLocation + ConverterConstants.BACKSLASH + currentImageSource;
 
-            //String imageSourceFileLocation = ConverterConstants.CONVERTED_DOC_FOLDER_LOCATION + ConverterConstants.BACKSLASH + currentImageSource;
-
             String base64 = getBase64OfImage(imageSourceFileLocation);
-            //String base64Source = BASE_64_IMAGE_SOURCE_ROOT + base64;
 
             imgElement.attributes().remove("src");
             imgElement.attributes().put("src", base64);
@@ -318,6 +315,7 @@ public class HtmlCleaner {
             byte[] svgBytes = bos.toByteArray();
             byte[] base64Bytes = Base64.getEncoder().encode(svgBytes);
             String svgBase64 = new String(base64Bytes);
+            fis.close();
             //TODO: find a better way to remove last 2 invalid strings
             return svgBase64.substring(0, svgBase64.length() - 2);
 
