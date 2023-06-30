@@ -13,9 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
-
-import org.apache.poi.hslf.blip.Bitmap;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -49,13 +46,13 @@ public class HtmlCleaner {
         removableTexts.add("Evaluation Only. Created with Aspose.Cells for Java.Copyright 2003 - 2023 Aspose Pty Ltd.");
 
         BASE_64_IMAGE_SOURCE_ROOT.put("png", "data:image/png;base64,");
-        BASE_64_IMAGE_SOURCE_ROOT.put("jpeg", "data:image/png;base64,");
+        BASE_64_IMAGE_SOURCE_ROOT.put("jpeg", "data:image/jpg;base64,");
         BASE_64_IMAGE_SOURCE_ROOT.put("svg", "data:image/svg+xml;base64,");
         BASE_64_IMAGE_SOURCE_ROOT.put("bmp", "data:image/bmp;base64,");
         BASE_64_IMAGE_SOURCE_ROOT.put("gif", "data:image/gif;base64,");
     }
 
-    public static void replaceImgTags(String file, String fileType) throws IOException
+    public static void replaceImgTags(String file, String fileType, int index) throws IOException
     {
         Document doc = Jsoup.parse(new File(file));
         Iterator<Element> imgIterator = doc.getElementsByTag("img").iterator();
@@ -67,14 +64,11 @@ public class HtmlCleaner {
 
             String currentImageSource = imgElement.attributes().get("src");
 
-            String folderLocation = FileTypeUtils.getImagesFolderLocation(fileType);
+            String folderLocation = FileTypeUtils.getImagesFolderLocation(fileType, index);
 
             String imageSourceFileLocation = folderLocation + ConverterConstants.BACKSLASH + currentImageSource;
 
-            //String imageSourceFileLocation = ConverterConstants.CONVERTED_DOC_FOLDER_LOCATION + ConverterConstants.BACKSLASH + currentImageSource;
-
             String base64 = getBase64OfImage(imageSourceFileLocation);
-            //String base64Source = BASE_64_IMAGE_SOURCE_ROOT + base64;
 
             imgElement.attributes().remove("src");
             imgElement.attributes().put("src", base64);
@@ -98,16 +92,22 @@ public class HtmlCleaner {
         Files.writeString(Path.of(file), doc.outerHtml());
     }
 
-    public static void cleanExcelHtml() throws IOException
+    public static void cleanExcelHtml(String fileType, int index) throws IOException
     {
         usableFiles.clear();
         deletableFiles.clear();
 
-        findTabsToDeleteAndKeep();
-        removeTabsFromFile();
-        removeEvaluationMarksFromEachFile();
-        replaceDefaultSheet();
-        removeFromFileList(Jsoup.parse(new File(FILE_LIST_FILE_LOCATION), null, "", Parser.xmlParser()));
+        String convertedIndexedFolderLocation = FileTypeUtils.getIndexedFolderLocation(fileType, index);
+        String tempFolderLocation = convertedIndexedFolderLocation + ConverterConstants.BACKSLASH + ConverterConstants.XLS_TEMP_FOLDER_NAME;
+        String fileListFileLocation = tempFolderLocation + ConverterConstants.BACKSLASH + FILE_LIST_FILE_NAME;
+        String tabListLocation = tempFolderLocation + ConverterConstants.BACKSLASH + TAB_LIST_FILE_NAME;
+        String rootHtmlFileLocation = FileTypeUtils.getConvertedFileLocation(fileType, index);
+
+        findTabsToDeleteAndKeep(tabListLocation);
+        removeTabsFromFile(tempFolderLocation);
+        removeEvaluationMarksFromEachFile(tempFolderLocation);
+        replaceDefaultSheet(rootHtmlFileLocation);
+        removeFromFileList(fileListFileLocation);
     }
 
     private static void deleteFirstPictureFile()
@@ -116,9 +116,9 @@ public class HtmlCleaner {
         fileToDel.delete();
     }
 
-    private static void findTabsToDeleteAndKeep() throws IOException
+    private static void findTabsToDeleteAndKeep(String tabListFileLocation) throws IOException
     {
-        Document doc = Jsoup.parse(new File(TAB_LIST_FILE_LOCATION));
+        Document doc = Jsoup.parse(new File(tabListFileLocation));
         Iterator<Element> elementIterator = doc.select("td").iterator();
 
         while(elementIterator.hasNext())
@@ -135,31 +135,31 @@ public class HtmlCleaner {
             }
         }
 
-        Files.writeString(Path.of(TAB_LIST_FILE_LOCATION), doc.outerHtml());
+        Files.writeString(Path.of(tabListFileLocation), doc.outerHtml());
     }
 
-    private static void removeTabsFromFile()
+    private static void removeTabsFromFile(String tempFolderLocation)
     {
         File fileToDel;
 
         for(String tabFileName: deletableFiles)
         {
-            fileToDel = new File(ConverterConstants.XLS_TEMP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + tabFileName);
+            fileToDel = new File(tempFolderLocation + ConverterConstants.BACKSLASH + tabFileName);
             fileToDel.delete();
         }
     }
 
-    private static void removeEvaluationMarksFromEachFile() throws IOException
+    private static void removeEvaluationMarksFromEachFile(String tempFolderLocation) throws IOException
     {
         for(String tabFileName: usableFiles)
         {
-            File fileToTraverse = new File(ConverterConstants.XLS_TEMP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + tabFileName);
+            File fileToTraverse = new File(tempFolderLocation + ConverterConstants.BACKSLASH + tabFileName);
 
             Document doc = Jsoup.parse(fileToTraverse);
 
             removeEvaluationFromSheet(doc);
 
-            Files.writeString(Path.of(ConverterConstants.XLS_TEMP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + tabFileName), doc.outerHtml());
+            Files.writeString(Path.of(tempFolderLocation + ConverterConstants.BACKSLASH + tabFileName), doc.outerHtml());
         }
     }
 
@@ -178,9 +178,9 @@ public class HtmlCleaner {
         }
     }
 
-    private static void replaceDefaultSheet() throws IOException
+    private static void replaceDefaultSheet(String rootHtmlFileLocation) throws IOException
     {
-        Document doc = Jsoup.parse(new File(ConverterConstants.XLS_CONVERTED_ROOT_HTML_FILE_LOCATION));
+        Document doc = Jsoup.parse(new File(rootHtmlFileLocation));
         Iterator<Element> elementIterator = doc.select("frame").iterator();
 
         String firstSheet = usableFiles.get(0);
@@ -197,7 +197,7 @@ public class HtmlCleaner {
             }
         }
 
-        Files.writeString(Path.of(ConverterConstants.XLS_CONVERTED_ROOT_HTML_FILE_LOCATION), doc.outerHtml());
+        Files.writeString(Path.of(rootHtmlFileLocation), doc.outerHtml());
     }
 
     private static void removeFirstPicture(Document doc)
@@ -237,8 +237,9 @@ public class HtmlCleaner {
 
     }
 
-    private static void removeFromFileList(Document doc) throws IOException
+    private static void removeFromFileList(String fileListFileLocation) throws IOException
     {
+        Document doc = Jsoup.parse(new File(fileListFileLocation), null, "", Parser.xmlParser());
         Iterator<Element> fileListIterator = doc.getElementsByAttribute("HRef").iterator();
 
         while(fileListIterator.hasNext())
@@ -251,7 +252,7 @@ public class HtmlCleaner {
             }
         }
 
-        Files.writeString(Path.of(FILE_LIST_FILE_LOCATION), doc.outerHtml());
+        Files.writeString(Path.of(fileListFileLocation), doc.outerHtml());
     }
 
     private static String getBase64OfImage(String fileLocation) throws IOException
@@ -318,6 +319,7 @@ public class HtmlCleaner {
             byte[] svgBytes = bos.toByteArray();
             byte[] base64Bytes = Base64.getEncoder().encode(svgBytes);
             String svgBase64 = new String(base64Bytes);
+            fis.close();
             //TODO: find a better way to remove last 2 invalid strings
             return svgBase64.substring(0, svgBase64.length() - 2);
 

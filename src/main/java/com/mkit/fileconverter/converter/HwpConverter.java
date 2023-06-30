@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
+import com.mkit.fileconverter.util.FileTypeUtils;
 import com.mkit.fileconverter.util.HtmlCleaner;
 
 public class HwpConverter implements Converter {
@@ -16,13 +17,15 @@ public class HwpConverter implements Converter {
     @Override
     public String convertToHtml(String uploadedFileLocation, int fileIndex) throws IOException {
 
-        //This needs to call a python script
-        //This python script needs to be bundled together
-
-    String hwpFileLocation = ConverterConstants.UPLOADED_HWP_FILE_LOCATION;
+    String fileType = FileTypeUtils.getFileType(uploadedFileLocation);
+    String convertedFileLocation = FileTypeUtils.getConvertedFileLocation(fileType, fileIndex);
+    String convertedHwpIndexedFolderLocation = FileTypeUtils.getIndexedFolderLocation(fileType, fileIndex);
+    
     String pythonScript = "C:\\Users\\Zorig\\Desktop\\Work\\hwp2html\\hwp_to_html2.py";
-        
-    ProcessBuilder processBuilder = new ProcessBuilder("python", pythonScript, hwpFileLocation);
+    
+    //This needs to call a python script
+    //This python script needs to be bundled together
+    ProcessBuilder processBuilder = new ProcessBuilder("python", pythonScript, uploadedFileLocation);
     processBuilder.directory(new File(ConverterConstants.CONVERTED_HWP_FOLDER_LOCATION));
     //TODO: change back working directory
     
@@ -36,7 +39,7 @@ public class HwpConverter implements Converter {
     try {
         process.waitFor();
 
-        HtmlCleaner.replaceImgTags(ConverterConstants.HWP_ROOT_CONVERTED_FILE_LOCATION, "hwp");
+        HtmlCleaner.replaceImgTags(convertedFileLocation, "hwp", fileIndex);
     } catch (InterruptedException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();

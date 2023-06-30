@@ -1,9 +1,15 @@
 package com.mkit.fileconverter.manager;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Stack;
+
+import org.apache.commons.io.FileUtils;
+
+import com.mkit.fileconverter.converter.ConverterConstants;
+import com.mkit.fileconverter.util.FileTypeUtils;
 
 public class FileVersionManager {
 
@@ -19,25 +25,13 @@ public class FileVersionManager {
         initializeStack(pdfStack, 30);
     }
 
-    public static void createDirectory(String filePath) throws IOException
-    {
-        Files.createDirectory(Paths.get(filePath));
-    }
-
-    public static void deleteProcessedFile(String fileType, int index)
-    {
-        //delete in here
-        //free up index in queue
-        throw new UnsupportedOperationException();
-    }
-
     public static int getNextAvailableIndex(String fileType)
     {
         Stack<Integer> stack = getStackAccordingToFileType(fileType);
         return stack.pop();
     }
 
-    public void releaseIndex(String fileType, int index)
+    public static void releaseIndex(String fileType, int index) throws IOException
     {
         Stack<Integer> stack = getStackAccordingToFileType(fileType);
 
@@ -45,8 +39,30 @@ public class FileVersionManager {
         {
             throw new UnsupportedOperationException();
         }
-
+        deleteRelatedFiles(fileType, index);
         stack.push(Integer.valueOf(index));
+    }
+
+    private static void deleteRelatedFiles(String fileType, int index) throws IOException
+    {
+        String uploadedFileToDelete = FileTypeUtils.getUploadedFileLocation(fileType, index);
+        String convertedFolderToDelete = FileTypeUtils.getIndexedFolderLocation(fileType, index);
+
+        if(fileType.equals("xls") || fileType.equals("xlsx"))
+        {
+            String zipFileName = FileTypeUtils.getIndexedZipFileName(fileType, index);
+            String zipFileToDelete = ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + zipFileName + ConverterConstants.ZIP_EXTENSION;
+            deleteFile(zipFileToDelete);
+        }
+
+        deleteFile(uploadedFileToDelete);
+        FileUtils.deleteDirectory(new File(convertedFolderToDelete));
+    }
+
+    private static void deleteFile(String file)
+    {
+        File fileToDel = new File(file);
+        fileToDel.delete();
     }
 
     private static void initializeStack(Stack<Integer> stack, int stackLimit)
@@ -62,9 +78,15 @@ public class FileVersionManager {
         switch (fileType) {
             case "hwp":
                 return hwpStack;
+            case "hwpx":
+                return hwpStack;    
             case "doc":
                 return doctack;
+            case "docx":
+                return doctack;
             case "xls":
+                return xlstack;
+            case "xlsx":
                 return xlstack;
             case "pdf":
                 return pdfStack;

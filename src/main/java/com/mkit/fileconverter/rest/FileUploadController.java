@@ -18,14 +18,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mkit.fileconverter.converter.ConverterConstants;
 import com.mkit.fileconverter.manager.FileVersionManager;
 import com.mkit.fileconverter.service.FileCompressionService;
 import com.mkit.fileconverter.service.FileConverterService;
 import com.mkit.fileconverter.service.FileUploaderService;
 import com.mkit.fileconverter.util.FileTypeUtils;
 
-import ch.qos.logback.classic.Logger;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
@@ -41,14 +39,57 @@ public class FileUploadController {
     @Autowired
     private FileCompressionService fileCompressionService;
 
-    @GetMapping(value = "/compress", produces = "application/zip")
-    public void getCompressedFiles(@RequestParam("file") String file, HttpServletResponse response) throws IOException
+    @GetMapping(value = "/zip")
+    public void testZipFile(HttpServletResponse response) throws Exception
     {
-        //setting headers
+        String originalFileName = "placeholder-excel.xlsx";
+        if (null == originalFileName)
+        {
+		    throw new Exception();
+		}
+
+        fileCompressionService.compressFile(originalFileName, 30);
+
+            //setting headers
         response.setStatus(HttpServletResponse.SC_OK);
         response.addHeader("Content-Disposition", "attachment; filename=\"test.zip\"");
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Allow-Private-Network", "false");
 
-        fileCompressionService.getCompressedFile(file, response.getOutputStream());
+        fileCompressionService.getCompressedFile(originalFileName, 30,response.getOutputStream());
+    }
+
+    @PostMapping(value = "/upload/compressed", produces = "application/zip")
+    public void convertAndReturnCompressedFiles(@RequestPart("file") MultipartFile file, HttpServletResponse response) throws Exception
+    {
+        String originalFileName = file.getOriginalFilename();
+        if (null == originalFileName)
+        {
+		    throw new Exception();
+		}
+
+        int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName));
+
+        try {
+
+            fileUploaderService.uploadFile(originalFileName, file.getBytes(), fileIndex);
+
+            fileConverterService.convertUploadedFileUsingFactory(originalFileName, fileIndex);
+
+            fileCompressionService.compressFile(originalFileName, fileIndex);
+
+            //setting headers
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.addHeader("Content-Disposition", "attachment; filename=\"test.zip\"");
+            response.addHeader("Access-Control-Allow-Origin", "*");
+            response.addHeader("Access-Control-Allow-Private-Network", "false");
+
+            fileCompressionService.getCompressedFile(originalFileName, fileIndex,response.getOutputStream());
+		} catch (Exception e) {
+            e.printStackTrace();
+		}
+
+        //FileVersionManager.releaseIndex(FileTypeUtils.getFileType(originalFileName), fileIndex);
     }
 
     
@@ -68,8 +109,6 @@ public class FileUploadController {
 
             fileConverterService.convertUploadedFileUsingFactory(originalFileName, fileIndex);
 
-            //fileCompressionService.compressFile(originalFileName);
-
             String html = fileCompressionService.retrieveRootHtml(originalFileName, fileIndex);
 
             HttpHeaders headers = new HttpHeaders();
@@ -78,20 +117,19 @@ public class FileUploadController {
             
             String convertedString = StringEscapeUtils.escapeHtml4(html);
             String fileType = originalFileName.substring(originalFileName.lastIndexOf(".")).replace(".","");
-            String fileName = originalFileName.substring(0,originalFileName.lastIndexOf(".")).replace(".","");
 
-             Map<String, Object> map = new HashMap<String, Object>();
-            map.put("index", fileName);
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("index", fileIndex);
             map.put("fileType", fileType);
             map.put("html", convertedString);
         
+            FileVersionManager.releaseIndex(fileType, fileIndex);
             return new ResponseEntity<Object>(map, headers, 200);
 		} catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<Object>("{'error':'NONE'}", null, 500);
-			//e.printStackTrace();
 		}
 
-        //return new ResponseEntity<String>("WRONG", null, 200);
     }
 
     @PostMapping

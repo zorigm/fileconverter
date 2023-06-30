@@ -17,7 +17,6 @@ public class FileUploaderService {
         String locationToUploadFile = FileTypeUtils.getUploadedFileLocation(FileTypeUtils.getFileType(fileName), index);
         writeBytesToFile(locationToUploadFile, bytes);
         //TODO: upload file based on  file type, use correct path
-        
     }
 
     private void writeBytesToFile(String fileOutput, byte[] bytes)
