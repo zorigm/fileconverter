@@ -12,7 +12,7 @@
     var fileType;
     var html;
     var apiUrl = 'http://192.82.66.43:9094';
-    apiUrl = 'http://192.168.0.120:8080';
+    apiUrl = 'http://localhost:8080';
 
     function convertFile() {
       // Get the selected file
@@ -65,9 +65,10 @@
           alert("Network error");
           loadingModal.style.display = "none";
         };
+        debugger;
         xhr.onload = function () {
           if (xhr.status === 200) {
-            const filename = 'file.zip'; // Specify the desired file name
+            const filename = file.name.substr(0,file.name.lastIndexOf(".")) + ".zip"; // Specify the desired file name
             const blob = new Blob([xhr.response], { type: 'application/octet-stream' });
       
             if (window.navigator && window.navigator.msSaveOrOpenBlob) {

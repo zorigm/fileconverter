@@ -23,29 +23,28 @@ import jakarta.servlet.ServletOutputStream;
 @Service
 public class FileCompressionService {
 
-    public String retrieveRootHtml(String file, int index)
-    {
+    public String retrieveRootHtml(String file, int index) {
         String fileType = FileTypeUtils.getFileType(file);
         String rootHtmlLocation = FileTypeUtils.getConvertedFileLocation(fileType, index);
         String rootStyleLocation = FileTypeUtils.getRootStylesLocation(fileType, index);
         String rootHtml = getStringFromHtmlFile(rootHtmlLocation);
 
-        if(rootStyleLocation == null)
-        {
+        if (rootStyleLocation == null) {
             return rootHtml;
         }
-        
+
         String rootStyle = getRootStyle(rootStyleLocation);
 
         return combineRootStyleAndRootHtml(rootHtml, rootStyle);
     }
 
-    public String getCompressedFile(String file, int index, ServletOutputStream servletOutputStream) throws IOException
-    {
+    public String getCompressedFile(String file, int index, ServletOutputStream servletOutputStream)
+            throws IOException {
         String fileType = FileTypeUtils.getFileType(file);
         String zipFileName = FileTypeUtils.getIndexedZipFileName(fileType, index);
-        String zippedFolderLocation = ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + zipFileName + ConverterConstants.ZIP_EXTENSION;
-        
+        String zippedFolderLocation = ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH
+                + zipFileName + ConverterConstants.ZIP_EXTENSION;
+
         ZipOutputStream zipOutputStream = new ZipOutputStream(servletOutputStream);
         zipOutputStream.putNextEntry(new ZipEntry(zippedFolderLocation));
         FileInputStream fileInputStream = new FileInputStream(new File(zippedFolderLocation));
@@ -57,14 +56,16 @@ public class FileCompressionService {
 
         return zipFileName;
     }
-    
-    public String compressFile(String file, int index) throws IOException
-    {
+
+    public String compressFile(String file, int index) throws IOException {
         String fileType = FileTypeUtils.getFileType(file);
         String sourceFile = FileTypeUtils.getDirectoryToZip(fileType, index);
         String zipFileName = FileTypeUtils.getIndexedZipFileName(fileType, index);
 
-        // FileOutputStream fos = new FileOutputStream(ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + zipFileName + ConverterConstants.ZIP_EXTENSION);
+        // FileOutputStream fos = new
+        // FileOutputStream(ConverterConstants.ZIP_FOLDER_LOCATION +
+        // ConverterConstants.BACKSLASH + zipFileName +
+        // ConverterConstants.ZIP_EXTENSION);
         // ZipOutputStream zipOut = new ZipOutputStream(fos);
 
         // File fileToZip = new File(sourceFile);
@@ -72,20 +73,21 @@ public class FileCompressionService {
         // zipOut.close();
         // fos.close();
 
-        zipDirectory(sourceFile, zipFileName);
+        String zippedUrl = zipDirectory(sourceFile, zipFileName);
 
-        return zipFileName;
+        return zippedUrl;
     }
 
-    private void zipDirectory(String fileToZip, String zipFileName) throws FileNotFoundException, IOException
-    {
+    private String zipDirectory(String fileToZip, String zipFileName) throws FileNotFoundException, IOException {
         ZipUtility zipUtility = new ZipUtility();
 
-        zipUtility.zip(Collections.singletonList(new File(fileToZip)), ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + zipFileName + ConverterConstants.ZIP_EXTENSION);
+        zipUtility.zip(Collections.singletonList(new File(fileToZip)), ConverterConstants.ZIP_FOLDER_LOCATION
+                + ConverterConstants.BACKSLASH + zipFileName + ConverterConstants.ZIP_EXTENSION);
+        return ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + zipFileName
+                + ConverterConstants.ZIP_EXTENSION;
     }
 
-    private void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException
-    {
+    private void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
         if (fileToZip.isHidden()) {
             return;
         }
@@ -114,8 +116,7 @@ public class FileCompressionService {
         fis.close();
     }
 
-    private String getStringFromHtmlFile(String file)
-    {
+    private String getStringFromHtmlFile(String file) {
         StringBuilder contentBuilder = new StringBuilder();
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
@@ -131,8 +132,7 @@ public class FileCompressionService {
         return content;
     }
 
-    private String getRootStyle(String file)
-    {
+    private String getRootStyle(String file) {
         StringBuilder contentBuilder = new StringBuilder();
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
@@ -148,10 +148,7 @@ public class FileCompressionService {
         return content;
     }
 
-    private String combineRootStyleAndRootHtml(String html, String style)
-    {
+    private String combineRootStyleAndRootHtml(String html, String style) {
         return html.split("</head>")[0] + "</head><style>" + style + "</style>" + html.split("</head>")[1];
     }
 }
-
-
