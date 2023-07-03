@@ -82,6 +82,8 @@ public class FileUploadController {
 
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("attachment", "test.zip");
+        headers.add("Access-Control-Allow-Private-Network", "false");
+        headers.add("Access-Control-Allow-Origin", "*");
 
         File zipfile = new File(zipFileUrl);
 
