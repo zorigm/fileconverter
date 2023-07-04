@@ -24,11 +24,15 @@ import jakarta.servlet.ServletOutputStream;
 public class FileCompressionService {
 
     public String retrieveRootHtml(String file, int index) {
-        String fileType = FileTypeUtils.getFileType(file);
+        String fileType = FileTypeUtils.getFileType(file).toString();
         String rootHtmlLocation = FileTypeUtils.getConvertedFileLocation(fileType, index);
         String rootStyleLocation = FileTypeUtils.getRootStylesLocation(fileType, index);
         String rootHtml = getStringFromHtmlFile(rootHtmlLocation);
 
+       
+        if(fileType.toLowerCase().equals("pdf")){
+            rootHtml = pdfStyleAndRootHtml(rootHtml);
+        }
         if (rootStyleLocation == null) {
             return rootHtml;
         }
@@ -149,6 +153,13 @@ public class FileCompressionService {
     }
 
     private String combineRootStyleAndRootHtml(String html, String style) {
-        return html.split("</head>")[0] + "</head><style>" + style + "</style>" + html.split("</head>")[1];
+        return html.split("</]>")[0] + "</head><style>" + style + "</style>" + html.split("</head>")[1];
     }
+
+     private String pdfStyleAndRootHtml(String html) {
+        html = html.split("<style type=\"text/css\">")[0] + "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js\"></script><style type=\"text/css\">div.page { border-color: black !important;} div.page div.p{width:unset!important;}" + html.split("<style type=\"text/css\">")[1];
+        html = html.replaceAll(";\">··········",";font-style:italic;\">··········" );
+        return html;
+    }
+
 }

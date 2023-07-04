@@ -1,10 +1,7 @@
 package com.mkit.fileconverter.rest;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -95,7 +91,7 @@ public class FileUploadController {
     }
 
     @PostMapping(value = "/upload")
-    public ResponseEntity<Object> convertUploadedFile(@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<String> convertUploadedFile(@RequestPart("file") MultipartFile file) throws IOException {
         String originalFileName = file.getOriginalFilename();
         if (null == originalFileName) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -114,19 +110,15 @@ public class FileUploadController {
             headers.add("Access-Control-Allow-Private-Network", "false");
             headers.add("Access-Control-Allow-Origin", "*");
 
-            String convertedString = StringEscapeUtils.escapeHtml4(html);
+
             String fileType = originalFileName.substring(originalFileName.lastIndexOf(".")).replace(".", "");
+          
 
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("index", fileIndex);
-            map.put("fileType", fileType);
-            map.put("html", convertedString);
-
-            FileVersionManager.releaseIndex(fileType, fileIndex);
-            return new ResponseEntity<Object>(map, headers, 200);
+            //FileVersionManager.releaseIndex(fileType, fileIndex);
+            return new ResponseEntity<String>(html, headers, 200);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<Object>("{'error':'NONE'}", null, 500);
+            return new ResponseEntity<String>("ERROR", null, 500);
         }
 
     }
