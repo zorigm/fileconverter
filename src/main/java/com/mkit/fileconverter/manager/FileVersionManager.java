@@ -21,7 +21,7 @@ public class FileVersionManager {
     static {
         initializeStack(hwpStack, 30);
         initializeStack(doctack, 30);
-        initializeStack(xlstack, 30);
+        initializeStack(xlstack, 1000);
         initializeStack(pdfStack, 30);
     }
 
