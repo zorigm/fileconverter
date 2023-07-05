@@ -8,7 +8,7 @@
   <script>// Function to handle file selection and conversion
 
     var apiUrl = 'http://192.82.66.43:9094';
-    //apiUrl = 'http://192.168.0.133:8080';
+    apiUrl = 'http://192.168.0.133:8080';
 
     function convertFile() {
       // Get the selected file
@@ -41,7 +41,7 @@
       // Send a POST request to the server
       $("#loadingModal").show();
       $("#convertedTextOutput").hide();
-      $("#convertedHtmlOutput").show();
+      $("#convertedHtmlOutput").hide();
       $("#image-container").show();
 
       var xhr = new XMLHttpRequest();
