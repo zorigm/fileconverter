@@ -151,7 +151,7 @@ public class FileCompressionService {
     }
 
     private String combineRootStyleAndRootHtml(String html, String style) {
-        return html.split("</]>")[0] + "</head><style>" + style + "</style>" + html.split("</head>")[1];
+        return html.split("</head>")[0] + "</head><style>" + style + "</style>" + html.split("</head>")[1];
     }
 
     private String pdfStyleAndRootHtml(String html) {
