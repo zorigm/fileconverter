@@ -2,8 +2,6 @@ package com.mkit.fileconverter.manager;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Stack;
 
 import org.apache.commons.io.FileUtils;
@@ -21,13 +19,17 @@ public class FileVersionManager {
     static {
         initializeStack(hwpStack, 30);
         initializeStack(doctack, 30);
-        initializeStack(xlstack, 30);
+        initializeStack(xlstack, 1000);
         initializeStack(pdfStack, 30);
     }
 
     public static int getNextAvailableIndex(String fileType)
     {
         Stack<Integer> stack = getStackAccordingToFileType(fileType);
+        if(stack.empty())
+        {
+            throw new UnsupportedOperationException();
+        }
         return stack.pop();
     }
 
@@ -35,7 +37,7 @@ public class FileVersionManager {
     {
         Stack<Integer> stack = getStackAccordingToFileType(fileType);
 
-        if(stack.empty())
+        if(stack.size() >= 30)
         {
             throw new UnsupportedOperationException();
         }
