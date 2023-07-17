@@ -39,8 +39,6 @@ public class XlsConverter implements Converter {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF-8"));
             writer.append(output.toString());
             writer.close();
-			System.out.println(output.toString());
-
             // Workbook workbook = new Workbook(uploadedFileLocation);
 
             // workbook.save(convertedFileLocation);

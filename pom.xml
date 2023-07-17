@@ -12,6 +12,7 @@
 	<artifactId>fileconverter</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>fileconverter</name>
+	<packaging>war</packaging>
 	<description>Convert files to HTML</description>
 	<properties>
 		<java.version>17</java.version>

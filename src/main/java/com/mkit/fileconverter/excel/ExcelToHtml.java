@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.format.CellFormat;
 import org.apache.poi.ss.format.CellFormatResult;
@@ -156,6 +158,7 @@ public final class ExcelToHtml {
                 out.format("<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>%n");
                 out.format("<html lang=\"en\">%n");
                 out.format("<head>%n");
+                out.format("<meta charset=\"UTF-8\" />");
                 out.format("</head>%n");
                 out.format("<body>%n");
             }
@@ -289,6 +292,17 @@ public final class ExcelToHtml {
         }
     }
 
+    private String inlineStyle(Font font){
+        StringBuilder sb = new StringBuilder();
+        try (Formatter fmt = new Formatter(sb, Locale.ROOT)) {
+            fmt.format("font-family: %s;",font.getFontName());
+            if(font.getBold()){
+                fmt.format("font-weight: %s;",font.getBold()); 
+            }
+            fmt.format("font-size: %spx;",font.getFontHeightInPoints());
+            return fmt.toString();
+        }
+    }
     private String inlineStyle(XSSFFont font){
         StringBuilder sb = new StringBuilder();
         try (Formatter fmt = new Formatter(sb, Locale.ROOT)) {
@@ -299,6 +313,41 @@ public final class ExcelToHtml {
             fmt.format("font-size: %spx;",font.getFontHeightInPoints());
             return fmt.toString();
         }
+    }
+
+    private String handleContent(HSSFCell cell) {
+        HSSFRichTextString val = cell.getRichStringCellValue();
+        int formatrun = val.numFormattingRuns();
+        String cont = val.getString();
+        StringBuilder sb = new StringBuilder();
+        if(formatrun > 0 ){
+            try (Formatter fmt = new Formatter(sb, Locale.ROOT)) {
+                for (int j = 0; j < formatrun; j++) {
+                    int startsat = val.getIndexOfFormattingRun(j);
+                    int total = val.length();
+                    int length = 0;
+                    // 0-5,6-15 total 15
+                    // current = 0
+                    // next = 6
+                    // len =5
+                    // current = 6
+                    // next = 9
+                    if (j+1 < formatrun) {
+                        length = val.getIndexOfFormattingRun(j+1)-startsat-1;
+                    }else{
+                        length = total -startsat;
+                    }
+                    
+                    String splitted = cont.substring(startsat,startsat+length);
+                    short fnt = val.getFontAtIndex(startsat);
+                    Font font = wb.getFontAt(fnt);
+                    String style = font != null? inlineStyle(font):"";
+                    fmt.format("<span style=\"%s\">%s</span>",style,splitted);
+                }      
+                return fmt.toString();          
+            }
+        }
+        return "";
     }
     
     private String handleContent(XSSFCell cell) {
@@ -312,8 +361,8 @@ public final class ExcelToHtml {
                     int startsat = val.getIndexOfFormattingRun(j);
                     int length = val.getLengthOfFormattingRun(j);
                     String splitted = cont.substring(startsat,startsat+length);
-                    XSSFFont fnt = val.getFontAtIndex(startsat);
-                    String style = inlineStyle(fnt);
+                    XSSFFont font = val.getFontAtIndex(startsat);
+                    String style = font != null? inlineStyle(font):"";
                     fmt.format("<span style=\"%s\">%s</span>",style,splitted);
                 }      
                 return fmt.toString();          
@@ -480,7 +529,7 @@ public final class ExcelToHtml {
                 CellStyle style = null;
                 Map<String,Integer> rowCellSpan = new TreeMap<>();
                 if (i >= row.getFirstCellNum() && i < row.getLastCellNum()) {
-                    XSSFCell xssfCell = (XSSFCell) row.getCell(i);
+                    
                     
                     Cell cell = row.getCell(i);
                     if (cell != null) {
@@ -495,12 +544,24 @@ public final class ExcelToHtml {
                         if (content.isEmpty()) {
                             content = "&nbsp;";
                         }
-                        if(xssfCell.getCellType().equals(CellType.STRING)){
-                            String subcontent = handleContent(xssfCell);
-                            if (!subcontent.isEmpty()) {
-                                content = subcontent;
+                        if (wb instanceof XSSFWorkbook){
+                            XSSFCell xssfCell = (XSSFCell) row.getCell(i);
+                            if(xssfCell.getCellType().equals(CellType.STRING)){
+                                String subcontent = handleContent(xssfCell);
+                                if (!subcontent.isEmpty()) {
+                                    content = subcontent;
+                                }
+                            }
+                        }else if(wb instanceof HSSFWorkbook){
+                            HSSFCell xssfCell = (HSSFCell) row.getCell(i);
+                            if(xssfCell.getCellType().equals(CellType.STRING)){
+                                String subcontent = handleContent(xssfCell);
+                                if (!subcontent.isEmpty()) {
+                                    content = subcontent;
+                                }
                             }
                         }
+                        
 
                     }
                 }
