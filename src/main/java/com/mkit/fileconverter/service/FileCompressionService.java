@@ -155,11 +155,8 @@ public class FileCompressionService {
     }
 
     private String pdfStyleAndRootHtml(String html) {
-        html = html.split("<style type=\"text/css\">")[0]
-                + "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js\"></script><style type=\"text/css\">div.page { border-color: black !important;} div.page div.p{width:unset!important;}"
-                + html.split("<style type=\"text/css\">")[1];
-               html = html.replaceAll(";\">··········", ";font-style:italic;\">··········");
-                html = html.replaceAll("overflow:hidden;\" />", "overflow:hidden;\" ></div>");
+         html = html.replaceAll("}#page-container", "}#page-remove_container");
+         html = html.replaceAll("#sidebar", "#sidebar-remove");
         return html;
     }
 

@@ -17,10 +17,10 @@ public class FileVersionManager {
     private static final Stack<Integer> pdfStack = new Stack<Integer>();
 
     static {
-        initializeStack(hwpStack, 30);
-        initializeStack(doctack, 30);
+        initializeStack(hwpStack, 1000);
+        initializeStack(doctack, 1000);
         initializeStack(xlstack, 1000);
-        initializeStack(pdfStack, 30);
+        initializeStack(pdfStack, 1000);
     }
 
     public static int getNextAvailableIndex(String fileType)

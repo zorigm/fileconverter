@@ -56,39 +56,39 @@ public class FileUploadController {
         fileCompressionService.getCompressedFile(originalFileName, 30, response.getOutputStream());
     }
 
-    @PostMapping(value = "/upload/compressed", produces = "application/zip")
-    public ResponseEntity<FileSystemResource> convertAndReturnCompressedFiles(@RequestPart("file") MultipartFile file,
-            HttpServletResponse response)
-            throws Exception {
-        String originalFileName = file.getOriginalFilename();
-        if (null == originalFileName) {
-            throw new Exception();
-        }
+    // @PostMapping(value = "/upload/compressed", produces = "application/zip")
+    // public ResponseEntity<FileSystemResource> convertAndReturnCompressedFiles(@RequestPart("file") MultipartFile file,
+    //         HttpServletResponse response)
+    //         throws Exception {
+    //     String originalFileName = file.getOriginalFilename();
+    //     if (null == originalFileName) {
+    //         throw new Exception();
+    //     }
 
-        int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName));
+    //     int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName));
 
-        fileUploaderService.uploadFile(originalFileName, file.getBytes(), fileIndex);
+    //     fileUploaderService.uploadFile(originalFileName, file.getBytes(), fileIndex);
 
-        fileConverterService.convertUploadedFileUsingFactory(originalFileName, fileIndex);
+    //     fileConverterService.convertUploadedFileUsingFactory(originalFileName, fileIndex);
 
-        String zipFileUrl = fileCompressionService.compressFile(originalFileName, fileIndex);
+    //     String zipFileUrl = fileCompressionService.compressFile(originalFileName, fileIndex);
 
-        // setting headers
-        HttpHeaders headers = new HttpHeaders();
+    //     // setting headers
+    //     HttpHeaders headers = new HttpHeaders();
 
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", "test.zip");
-        headers.add("Access-Control-Allow-Private-Network", "false");
-        headers.add("Access-Control-Allow-Origin", "*");
+    //     headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+    //     headers.setContentDispositionFormData("attachment", "test.zip");
+    //     headers.add("Access-Control-Allow-Private-Network", "false");
+    //     headers.add("Access-Control-Allow-Origin", "*");
 
-        File zipfile = new File(zipFileUrl);
+    //     File zipfile = new File(zipFileUrl);
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(new FileSystemResource(zipfile));
-        // FileVersionManager.releaseIndex(FileTypeUtils.getFileType(originalFileName),
-        // fileIndex);
-    }
+    //     return ResponseEntity.ok()
+    //             .headers(headers)
+    //             .body(new FileSystemResource(zipfile));
+    //     // FileVersionManager.releaseIndex(FileTypeUtils.getFileType(originalFileName),
+    //     // fileIndex);
+    // }
 
     @PostMapping(value = "/upload")
     public ResponseEntity<String> convertUploadedFile(@RequestPart("file") MultipartFile file) throws IOException {
@@ -98,7 +98,7 @@ public class FileUploadController {
         }
 
         try {
-            int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName));
+            int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName).toLowerCase());
 
             fileUploaderService.uploadFile(originalFileName, file.getBytes(), fileIndex);
 
