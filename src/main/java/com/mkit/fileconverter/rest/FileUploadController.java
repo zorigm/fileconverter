@@ -98,7 +98,7 @@ public class FileUploadController {
         }
 
         try {
-            int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName));
+            int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName).toLowerCase());
 
             fileUploaderService.uploadFile(originalFileName, file.getBytes(), fileIndex);
 

@@ -23,6 +23,6 @@ public class ConverterFactory {
 
     public static Optional<Converter> getConverter(String fileType)
     {
-        return Optional.ofNullable(converters.get(fileType));
+        return Optional.ofNullable(converters.get(fileType.toLowerCase()));
     }
 }

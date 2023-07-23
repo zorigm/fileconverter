@@ -7,7 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -75,9 +77,17 @@ public class FileCompressionService {
         // zipOut.close();
         // fos.close();
 
-        String zippedUrl = zipDirectory(sourceFile, zipFileName);
+        // String zippedUrl = zipDirectory(sourceFile, zipFileName);
+        ZipUtility zipUtility = new ZipUtility();
+        List<File> files = new ArrayList<>();
+        files.add(new File(sourceFile+"/placeholder-doc.html"));
+        files.add(new File(sourceFile+"/imgs"));
 
-        return zippedUrl;
+        zipUtility.zip(files, ConverterConstants.ZIP_FOLDER_LOCATION
+                + ConverterConstants.BACKSLASH + zipFileName + ConverterConstants.ZIP_EXTENSION);
+        return ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + zipFileName
+                + ConverterConstants.ZIP_EXTENSION;
+        // return zippedUrl;
     }
 
     private String zipDirectory(String fileToZip, String zipFileName) throws FileNotFoundException, IOException {
@@ -155,11 +165,8 @@ public class FileCompressionService {
     }
 
     private String pdfStyleAndRootHtml(String html) {
-        html = html.split("<style type=\"text/css\">")[0]
-                + "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js\"></script><style type=\"text/css\">div.page { border-color: black !important;} div.page div.p{width:unset!important;}"
-                + html.split("<style type=\"text/css\">")[1];
-               html = html.replaceAll(";\">··········", ";font-style:italic;\">··········");
-                html = html.replaceAll("overflow:hidden;\" />", "overflow:hidden;\" ></div>");
+         html = html.replaceAll("}#page-container", "}#page-remove_container");
+         html = html.replaceAll("#sidebar", "#sidebar-remove");
         return html;
     }
 
