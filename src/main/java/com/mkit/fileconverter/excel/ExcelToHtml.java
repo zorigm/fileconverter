@@ -414,6 +414,7 @@ public final class ExcelToHtml {
 
     public void printSheet(Sheet sheet,int index) {
         ensureOut();
+        gotBounds = false;
         Map<Integer, Integer> widths = computeWidths(sheet);
         int tableWidth = widths.get(IDX_TABLE_WIDTH);
         out.format("<table class=%s id=table_%s style=\"width:%dpx;display:none\">%n", DEFAULTS_CLASS,index, tableWidth);
