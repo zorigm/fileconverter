@@ -10,6 +10,7 @@
             var apiUrl = 'http://192.82.66.43:9094';
             apiUrl = 'http://192.168.0.133:8080';
             var convertedFileName = "";
+            var convertedHtmlRaw = "";
 
             function convertFile() {
                 // Get the selected file
@@ -29,7 +30,7 @@
 
                 // Validate file type (only HWP, HWPX, DOC, DOCX, XLS, XLSX or PDF allowed)
                 //var allowedTypes = ['hwp', 'hwpx', 'doc', 'docx', 'pdf', 'xls', 'xlsx', ];
-                var allowedTypes = ['hwp', 'doc', 'docx', 'pdf', 'xls', 'xlsx', ];
+                var allowedTypes = ['hwp', 'hwpx', 'doc', 'docx', 'pdf', 'xls', 'xlsx' ];
 
                 if (!allowedTypes.includes(file.name.substr(file.name.lastIndexOf(".") + 1).toLowerCase())) {
                     /*alert('Please select a HWP, HWPX, DOC, DOCX, XLS, XLSX or PDF file.');*/
@@ -50,53 +51,51 @@
                 var xhr = new XMLHttpRequest();
                 xhr.timeout = 360000;
 
-                // if (fileType === "xls" || fileType === "xlsx") {
+                 if (fileType === "doc" || fileType === "docx") {
 
-                //     $("#convertedTextOutput").hide();
-                //     $("#convertedHtmlOutput").hide();
-                //     $("#downloadButton").hide();
-                //     $("#previewButton").hide();
-                //     $("#image-container").show();
+                     $("#convertedTextOutput").hide();
+                     $("#convertedHtmlOutput").hide();
+                     $("#downloadButton").hide();
+                     $("#previewButton").hide();
+                     $("#image-container").show();
 
-                //     xhr.open('POST', apiUrl + '/file-convert/upload/compressed', true);
+                     xhr.open('POST', apiUrl + '/file-convert/upload/compressed', true);
 
-                //     xhr.responseType = 'arraybuffer';
-                //     xhr.onerror = function() {
-                //         alert("Network error");
-                //         $("#loadingModal").hide();
-                //     }
-                //     ;
-                //     xhr.onload = function() {
-                //         if (xhr.status === 200) {
-                //             const filename = file.name.substr(0, file.name.lastIndexOf(".")) + ".zip";
-                //             // Specify the desired file name
-                //             const blob = new Blob([xhr.response],{
-                //                 type: 'application/octet-stream'
-                //             });
+                
+                     xhr.onerror = function() {
+                         alert("Network error");
+                         $("#loadingModal").hide();
+                     }
+                     ;
+                     xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            // Display the converted HTML
+    
+                            convertedHtmlRaw = xhr.response;
+                            $("#convertedTextOutput")[0].innerText = xhr.response;
+                            $("#convertedHtmlOutput")[0].innerHTML = xhr.response;
+    
+                            if (fileType === "doc" && fileType === "docx") {
+                                $("#convertedHtmlOutput>div").css("width", "60%");
+                                $("#convertedHtmlOutput>div").css("margin", "auto");
+                            }
+                          
 
-                //             if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-                //                 // For IE browser
-                //                 window.navigator.msSaveOrOpenBlob(blob, filename);
-                //             } else {
-                //                 const url = window.URL.createObjectURL(blob);
-                //                 const link = document.createElement('a');
-                //                 link.href = url;
-                //                 link.download = filename;
-                //                 link.click();
-                //                 window.URL.revokeObjectURL(url);
-                //             }
-                //         } else {
-                //             alert('Error downloading the file. Please try again.');
-                //         }
-                //         $("#loadingModal").hide();
-                //     }
-                //     ;
-                //     xhr.send(formData);
-                // } else {
-
-                    
-                // }
-                xhr.open('POST', apiUrl + '/file-convert/upload', true);
+                            $("#convertedTextOutput").show();
+                            $("#convertedHtmlOutput").hide();
+                            $("#downloadButton").show();
+                            $("#previewButton").show();
+                            $("#image-container").hide();
+    
+                        } else {
+                            alert('Error converting the file. Please try again.');
+                        }
+                        $("#loadingModal").hide();
+                    }
+                    ;
+                     xhr.send(formData);
+                 } else {
+                    xhr.open('POST', apiUrl + '/file-convert/upload', true);
                 xhr.onerror = function() {
                     alert("Network error");
                     $("#loadingModal").hide();
@@ -106,13 +105,10 @@
                     if (xhr.status === 200) {
                         // Display the converted HTML
 
+                        convertedHtmlRaw = xhr.response;
                         $("#convertedTextOutput")[0].innerText = xhr.response;
                         $("#convertedHtmlOutput")[0].innerHTML = xhr.response;
 
-                        if (fileType === "doc" || fileType === "docx") {
-                            $("#convertedHtmlOutput>div").css("width", "60%");
-                            $("#convertedHtmlOutput>div").css("margin", "auto");
-                        }
                         if (fileType === "pdf") {
                             $("#convertedHtmlOutput>div#sidebar").css("display", "none!important");
                             $("#convertedHtmlOutput>div#page-container").css("position", "unset!important");
@@ -133,6 +129,7 @@
                 }
                 ;
                 xhr.send(formData);
+                 }
             }
 
             // Function to trigger the download of the HTML file
@@ -141,7 +138,7 @@
 
                 var link = document.createElement('a');
 
-                link.href = 'data:text/html;charset=utf-8,' + encodeURIComponent($("#convertedTextOutput")[0].innerHTML);
+                link.href = 'data:text/html;charset=utf-8,' + encodeURIComponent(convertedHtmlRaw);
                 link.download = convertedFileName + '.html';
 
                 // Simulate a click on the link to trigger the download

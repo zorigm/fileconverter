@@ -81,9 +81,13 @@ public class FileCompressionService {
         ZipUtility zipUtility = new ZipUtility();
         List<File> files = new ArrayList<>();
         files.add(new File(sourceFile+"/placeholder-doc.html"));
+        File img = new File(sourceFile+"/imgs");
+        if(img.exists())
         files.add(new File(sourceFile+"/imgs"));
 
         zipUtility.zip(files, ConverterConstants.ZIP_FOLDER_LOCATION
+                + ConverterConstants.BACKSLASH + zipFileName + ConverterConstants.ZIP_EXTENSION);
+        System.out.println(ConverterConstants.ZIP_FOLDER_LOCATION
                 + ConverterConstants.BACKSLASH + zipFileName + ConverterConstants.ZIP_EXTENSION);
         return ConverterConstants.ZIP_FOLDER_LOCATION + ConverterConstants.BACKSLASH + zipFileName
                 + ConverterConstants.ZIP_EXTENSION;
@@ -167,6 +171,7 @@ public class FileCompressionService {
     private String pdfStyleAndRootHtml(String html) {
          html = html.replaceAll("}#page-container", "}#page-remove_container");
          html = html.replaceAll("#sidebar", "#sidebar-remove");
+         html = html.replaceAll("}#sidebar-remove", "}#sidebar{display:none;}#sidebar-remove");
         return html;
     }
 

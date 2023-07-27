@@ -26,6 +26,8 @@
 	table-layout: fixed;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
+	margin-bottom: 40px;
+	width: 100% !important;
 }
 
 .excelDefaults td {

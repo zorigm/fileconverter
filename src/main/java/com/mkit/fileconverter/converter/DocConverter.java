@@ -77,6 +77,7 @@ public class DocConverter implements Converter {
                 default:
                     break;
             }
+            HtmlCleaner.replaceImgTags(convertedFileLocation, "doc", fileIndex);
             
         } catch (ParserConfigurationException | TransformerException e) {
             // TODO Auto-generated catch block
@@ -95,8 +96,7 @@ public class DocConverter implements Converter {
     	HTMLSettings htmlSettings = Docx4J.createHTMLSettings();
 
     	htmlSettings.setImageDirPath(convertedExcelIndexedFolderLocation + "/imgs");
-    	htmlSettings.setImageTargetUri(convertedFileLocation.substring(convertedFileLocation.lastIndexOf("/")+1)
-    			+ "_files");
+    	htmlSettings.setImageTargetUri("imgs");
     	htmlSettings.setOpcPackage(wordMLPackage);
 
     	String userCSS = "html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, img,  table, caption, tbody, tfoot, thead, tr, th, td " +
