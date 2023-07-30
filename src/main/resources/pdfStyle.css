@@ -1,0 +1,8 @@
+#convertedHtmlOutput>div#sidebar{
+	display: none !important;
+}
+#convertedHtmlOutput>div#page-container{
+	position: unset !important;
+	background-color: transparent !important;
+	background-image: none !important;
+}

@@ -1,0 +1,15 @@
+.Paper {
+	border: 1px solid transparent !important;
+}
+
+.Paper table td {
+	
+}
+
+.Paper table p {
+	white-space: nowrap;
+}
+
+.Paper .Page {
+	padding: 0px !important;
+}

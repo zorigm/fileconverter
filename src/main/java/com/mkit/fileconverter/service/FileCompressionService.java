@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -14,7 +15,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.compress.utils.IOUtils;
+import org.checkerframework.checker.units.qual.h;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 import com.mkit.fileconverter.converter.ConverterConstants;
 import com.mkit.fileconverter.util.FileTypeUtils;
@@ -33,6 +36,15 @@ public class FileCompressionService {
 
         if (fileType.toLowerCase().equals("pdf")) {
             rootHtml = pdfStyleAndRootHtml(rootHtml);
+        }
+        if (fileType.toLowerCase().equals("docx")) {
+            rootHtml = docxStyleAndRootHtml(rootHtml);
+        }
+        if (fileType.toLowerCase().equals("doc")) {
+            rootHtml = docStyleAndRootHtml(rootHtml);
+        }
+        if (fileType.toLowerCase().equals("hwp")) {
+            rootHtml = hwpStyleAndRootHtml(rootHtml);
         }
         if (rootStyleLocation != null) {
             String rootStyle = getRootStyle(rootStyleLocation);
@@ -80,10 +92,10 @@ public class FileCompressionService {
         // String zippedUrl = zipDirectory(sourceFile, zipFileName);
         ZipUtility zipUtility = new ZipUtility();
         List<File> files = new ArrayList<>();
-        files.add(new File(sourceFile+"/placeholder-doc.html"));
-        File img = new File(sourceFile+"/imgs");
-        if(img.exists())
-        files.add(new File(sourceFile+"/imgs"));
+        files.add(new File(sourceFile + "/placeholder-doc.html"));
+        File img = new File(sourceFile + "/imgs");
+        if (img.exists())
+            files.add(new File(sourceFile + "/imgs"));
 
         zipUtility.zip(files, ConverterConstants.ZIP_FOLDER_LOCATION
                 + ConverterConstants.BACKSLASH + zipFileName + ConverterConstants.ZIP_EXTENSION);
@@ -168,10 +180,51 @@ public class FileCompressionService {
         return html.split("</head>")[0] + "</head><style>" + style + "</style>" + html.split("</head>")[1];
     }
 
+    private String cssFileRead(String type) {
+        String style = "";
+        try (BufferedReader in = new BufferedReader(
+                new FileReader(ResourceUtils.getFile("classpath:" + type + "Style.css")))) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                style = style + line + "\n";
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Reading standard css", e);
+        }
+        return style;
+    }
+
     private String pdfStyleAndRootHtml(String html) {
-         html = html.replaceAll("}#page-container", "}#page-remove_container");
-         html = html.replaceAll("#sidebar", "#sidebar-remove");
-         html = html.replaceAll("}#sidebar-remove", "}#sidebar{display:none;}#sidebar-remove");
+        String style = cssFileRead("pdf");
+        html = html.replaceAll("}#page-container", "}#page-remove_container");
+        html = html.replaceAll("#sidebar", "#sidebar-remove");
+        html = html.replaceAll("}#sidebar-remove", "}#sidebar{display:none;}#sidebar-remove");
+        html = combineRootStyleAndRootHtml(html, style);
+        return html;
+    }
+
+    private String docxStyleAndRootHtml(String html) {
+        String style = cssFileRead("docx");
+        html = html.replaceAll("class=\"1 a", "class=\"font-1 a");
+        html = html.replaceAll("class=\"2 a", "class=\"font-2 a");
+        html = html.replaceAll("class=\"3 a", "class=\"font-3 a");
+        html = html.replaceAll("class=\"10 a", "class=\"padding-10 a");
+        html = html.replaceAll("class=\"20 a", "class=\"padding-20 a");
+        html = html.replaceAll("class=\"30 a", "class=\"padding-30 a");
+        html = combineRootStyleAndRootHtml(html, style);
+        return html;
+    }
+
+    private String docStyleAndRootHtml(String html) {
+        html = html.replace("<span> TOC \\o \"1-3\" \\h \\z \\u </span>", "");
+        String style = cssFileRead("doc");
+        html = combineRootStyleAndRootHtml(html, style);
+        return html;
+    }
+
+    private String hwpStyleAndRootHtml(String html) {
+        String style = cssFileRead("hwp");
+        html = combineRootStyleAndRootHtml(html, style);
         return html;
     }
 

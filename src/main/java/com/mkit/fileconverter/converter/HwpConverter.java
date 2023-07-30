@@ -17,36 +17,36 @@ public class HwpConverter implements Converter {
     @Override
     public String convertToHtml(String uploadedFileLocation, int fileIndex) throws IOException {
 
-    String fileType = FileTypeUtils.getFileType(uploadedFileLocation);
-    String convertedFileLocation = FileTypeUtils.getConvertedFileLocation(fileType, fileIndex);
-    String convertedHwpIndexedFolderLocation = FileTypeUtils.getIndexedFolderLocation(fileType, fileIndex);
-    
-    String pythonScript = "/var/www/hwp_to_html2.py";
-    //pythonScript = "D:\\SDK\\hwp_to_html2.py";
-    
-    //This needs to call a python script
-    //This python script needs to be bundled together
-    ProcessBuilder processBuilder = new ProcessBuilder("python3", pythonScript, uploadedFileLocation);
-    processBuilder.directory(new File(ConverterConstants.CONVERTED_HWP_FOLDER_LOCATION));
-    //TODO: change back working directory
-    
-    processBuilder.redirectErrorStream(true);
+        String fileType = FileTypeUtils.getFileType(uploadedFileLocation);
+        String convertedFileLocation = FileTypeUtils.getConvertedFileLocation(fileType, fileIndex);
+        String convertedHwpIndexedFolderLocation = FileTypeUtils.getIndexedFolderLocation(fileType, fileIndex);
 
-    //TODO: redirect output file
+        String pythonScript = "/var/www/hwp_to_html2.py";
+        // pythonScript = "D:\\SDK\\hwp_to_html2.py";
 
-    Process process = processBuilder.start();
-    List<String> results = readProcessOutput(process.getInputStream());
+        // This needs to call a python script
+        // This python script needs to be bundled together
+        ProcessBuilder processBuilder = new ProcessBuilder("python3", pythonScript, uploadedFileLocation);
+        processBuilder.directory(new File(ConverterConstants.CONVERTED_HWP_FOLDER_LOCATION));
+        // TODO: change back working directory
 
-    try {
-        process.waitFor();
+        processBuilder.redirectErrorStream(true);
 
-        HtmlCleaner.replaceImgTags(convertedFileLocation, "hwp", fileIndex);
-    } catch (InterruptedException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-    }
+        // TODO: redirect output file
 
-    return "DONE";
+        Process process = processBuilder.start();
+        List<String> results = readProcessOutput(process.getInputStream());
+
+        try {
+            process.waitFor();
+
+            HtmlCleaner.replaceImgTags(convertedFileLocation, "hwp", fileIndex);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return "DONE";
     }
 
     private List<String> readProcessOutput(InputStream inputStream) {

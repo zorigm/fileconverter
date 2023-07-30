@@ -22,38 +22,15 @@ public class PdfConverter implements Converter {
         String convertedFileLocation = FileTypeUtils.getConvertedFileLocation("pdf", fileIndex);
         String convertedPdfIndexedFolderLocation = FileTypeUtils.getIndexedFolderLocation("pdf", fileIndex);
         String convertedFileName = FileTypeUtils.getConvertedFileName("pdf");
-        
-       
+
         Files.createDirectory(Path.of(convertedPdfIndexedFolderLocation));
-         Set<PosixFilePermission> permissions = new HashSet<>();
-            permissions.add(PosixFilePermission.OWNER_READ);
-            permissions.add(PosixFilePermission.OWNER_WRITE);
-            permissions.add(PosixFilePermission.OWNER_EXECUTE);
-            permissions.add(PosixFilePermission.GROUP_READ);
-            permissions.add(PosixFilePermission.GROUP_WRITE);
-            permissions.add(PosixFilePermission.GROUP_EXECUTE);
-            permissions.add(PosixFilePermission.OTHERS_READ);
-            permissions.add(PosixFilePermission.OTHERS_WRITE);
-            permissions.add(PosixFilePermission.OTHERS_EXECUTE);
 
-            Files.setPosixFilePermissions(Path.of(convertedPdfIndexedFolderLocation), permissions);
-
-         String pythonScript = "/var/www/pdf_to_html.py";
-    
-        //This needs to call a python script
-        //This python script needs to be bundled together
-         
-        System.err.println(pythonScript);
-        System.err.println(uploadedFileLocation);
-        System.err.println(convertedPdfIndexedFolderLocation);
-        System.err.println(convertedFileName);
-        ProcessBuilder processBuilder = new ProcessBuilder("python3", pythonScript, uploadedFileLocation, convertedFileName, convertedPdfIndexedFolderLocation);
+        String pythonScript = "/var/www/pdf_to_html.py";
+        ProcessBuilder processBuilder = new ProcessBuilder("python3", pythonScript, uploadedFileLocation,
+                convertedFileName, convertedPdfIndexedFolderLocation);
         processBuilder.directory(new File(convertedPdfIndexedFolderLocation));
-        //TODO: change back working directory
 
         processBuilder.redirectErrorStream(true);
-
-        //TODO: redirect output file
 
         Process process = processBuilder.start();
         List<String> results = readProcessOutput(process.getInputStream());
@@ -62,14 +39,13 @@ public class PdfConverter implements Converter {
         try {
             process.waitFor();
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
         return "DONE";
     }
 
-        private List<String> readProcessOutput(InputStream inputStream) {
+    private List<String> readProcessOutput(InputStream inputStream) {
         String result;
         try {
             result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);

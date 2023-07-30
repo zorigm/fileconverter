@@ -37,7 +37,7 @@ public class FileVersionManager {
     {
         Stack<Integer> stack = getStackAccordingToFileType(fileType);
 
-        if(stack.size() >= 30)
+        if(stack.size() >= 1000)
         {
             throw new UnsupportedOperationException();
         }

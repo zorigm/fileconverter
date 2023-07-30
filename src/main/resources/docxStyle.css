@@ -1,0 +1,66 @@
+.document>* {
+	margin-left: 40px !important;
+	margin-right: 40px !important;
+}
+div.document>p {
+	margin-top: 4mm !important;
+}
+div.document p.font-1 {
+    font-size: 28px;
+    font-weight: bold;
+}
+div.document p.font-2 {
+    font-size: 24px;
+    font-weight: bold;
+}
+div.document p.font-3 {
+	font-size: 20px;
+    font-weight: bold;
+}
+
+div.document p.padding-10 a:nth-child(1) {
+	margin-left: 0px;
+}
+div.document p.padding-20 a:nth-child(1) {
+	margin-left: 30px;
+}
+div.document p.padding-30 a:nth-child(1) {
+	margin-left: 60px;
+}
+div.document p.padding-10 ,div.document p.padding-20 ,div.document p.padding-30 {
+	width: 90%;
+    display: inline-flex;
+    place-content: space-between;
+	line-height: 110% !important;
+}
+div.document p.padding-10 a:nth-child(1),div.document p.padding-20 a:nth-child(1),div.document p.padding-30 a:nth-child(1) {
+	width: 100%;
+	display: flex;
+}
+div.document p.padding-10 > a:hover,div.document p.padding-20 > a:hover,div.document p.padding-30 > a:hover {
+	background-color: #6995f393;
+}
+div.document p.padding-10 span.a0,div.document p.padding-20 span.a0,div.document p.padding-30 span.a0 {
+	display: none;
+}
+div.document p.padding-10 span.a0.ae,div.document p.padding-20 span.a0.ae,div.document p.padding-30 span.a0.ae {
+	display: block;
+}
+
+div.document>p,
+div.document table p span {
+	line-height: 165% !important;
+}
+.header,
+.footnotes,
+.footer {
+	display: none !important;
+}
+a[name=_PictureBullets] {
+	display: none !important;
+}
+#convertedHtmlOutput{
+	min-width: 211mm;
+	width: min-content !important;
+	padding: 40px;
+}

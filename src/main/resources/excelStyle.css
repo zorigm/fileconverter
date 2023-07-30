@@ -1,3 +1,10 @@
+.excelContainer{
+	position: fixed;
+    left: 0;
+    width: 100%;
+    height: 72%;
+    overflow-x: auto;
+}
 .excelDefaults {
 	background-color: white;
 	color: black;
@@ -27,7 +34,8 @@
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	margin-bottom: 40px;
-	width: 100% !important;
+	left: 0px;
+    position: absolute;
 }
 
 .excelDefaults td {
@@ -59,6 +67,8 @@
 	width: 100%;
 	background: silver;
 	border: 1px solid #3a3a3a;
+	overflow-y: hidden;
+    overflow-x: scroll;
 }
 .tabs button{
 	border: 0;

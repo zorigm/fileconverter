@@ -56,36 +56,6 @@ public class FileUploadController {
         fileCompressionService.getCompressedFile(originalFileName, 30, response.getOutputStream());
     }
 
-    @PostMapping(value = "/upload/compressed", produces = "application/zip")
-    public ResponseEntity<String> convertAndReturnCompressedFiles(@RequestPart("file") MultipartFile file,
-            HttpServletResponse response)
-            throws Exception {
-        String originalFileName = file.getOriginalFilename();
-        if (null == originalFileName) {
-            throw new Exception();
-        }
-        try{
-
-        int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName));
-
-        fileUploaderService.uploadFile(originalFileName, file.getBytes(), fileIndex);
-
-        fileConverterService.convertUploadedFileUsingFactory(originalFileName, fileIndex);
-
-                    String html = fileCompressionService.retrieveRootHtml(originalFileName, fileIndex);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Access-Control-Allow-Private-Network", "false");
-            headers.add("Access-Control-Allow-Origin", "*");
-
-            //FileVersionManager.releaseIndex(fileType, fileIndex);
-            return new ResponseEntity<String>(html, headers, 200);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<String>("ERROR", null, 500);
-        }
-    }
-
     @PostMapping(value = "/upload")
     public ResponseEntity<String> convertUploadedFile(@RequestPart("file") MultipartFile file) throws IOException {
         String originalFileName = file.getOriginalFilename();
@@ -94,11 +64,14 @@ public class FileUploadController {
         }
 
         try {
-            int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName).toLowerCase());
+            int fileIndex = FileVersionManager
+                    .getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName).toLowerCase());
 
             fileUploaderService.uploadFile(originalFileName, file.getBytes(), fileIndex);
 
             fileConverterService.convertUploadedFileUsingFactory(originalFileName, fileIndex);
+
+            String fileType = FileTypeUtils.getFileType(originalFileName);
 
             String html = fileCompressionService.retrieveRootHtml(originalFileName, fileIndex);
 
@@ -106,7 +79,7 @@ public class FileUploadController {
             headers.add("Access-Control-Allow-Private-Network", "false");
             headers.add("Access-Control-Allow-Origin", "*");
 
-            //FileVersionManager.releaseIndex(fileType, fileIndex);
+            // FileVersionManager.releaseIndex(fileType, fileIndex);
             return new ResponseEntity<String>(html, headers, 200);
         } catch (Exception e) {
             e.printStackTrace();

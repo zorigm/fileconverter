@@ -1,0 +1,35 @@
+a[name=_PictureBullets]{
+	display: none;
+}
+
+p:has(a[href*="#_Toc"]) {
+	display: inline-flex;
+    width: 96%;
+    place-content: space-between;
+    line-height: 115% !important;
+}
+p.p7 > span {
+	display: none;
+}
+p.p10{
+	margin-left: 0px;
+}
+p:has(a[href*="#_Toc"]) a:nth-child(odd){
+	width: 100%;
+    display: flex;
+}
+p:has(a[href*="#_Toc"]) a{
+	text-decoration: none;
+	border-bottom: 2px dotted #0000ff;
+}
+p.p10:has(a[href*="#_Toc"]) > a::nth-child(1){
+	margin-left: 30px;
+}
+p:has(a[href*="#_Toc"]) a > span{
+	text-decoration:none !important;
+}
+#convertedHtmlOutput{
+	min-width: 211mm;
+	width: min-content !important;
+	padding: 40px;
+}

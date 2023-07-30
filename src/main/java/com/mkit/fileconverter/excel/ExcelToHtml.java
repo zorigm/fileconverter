@@ -161,11 +161,13 @@ public final class ExcelToHtml {
                 out.format("<meta charset=\"UTF-8\" />");
                 out.format("</head>%n");
                 out.format("<body>%n");
+                out.format("<div class=\"excelContainer\">%n");
             }
             
             print();
             
             if (completeHTML) {
+                out.format("</div>%n");
                 out.format("</body>%n");
                 out.format("</html>%n");
             }
