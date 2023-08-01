@@ -11,16 +11,16 @@ import com.mkit.fileconverter.util.FileTypeUtils;
 
 public class FileVersionManager {
 
-    private final static Stack<Integer> hwpStack = new Stack<Integer>();
-    private final static Stack<Integer> doctack = new Stack<Integer>();
-    private final static Stack<Integer> xlstack = new Stack<Integer>();
-    private final static Stack<Integer> pdfStack = new Stack<Integer>();
+    private static final Stack<Integer> hwpStack = new Stack<Integer>();
+    private static final Stack<Integer> doctack = new Stack<Integer>();
+    private static final Stack<Integer> xlstack = new Stack<Integer>();
+    private static final Stack<Integer> pdfStack = new Stack<Integer>();
 
     static {
-        initializeStack(hwpStack, 30);
-        initializeStack(doctack, 30);
+        initializeStack(hwpStack, 1000);
+        initializeStack(doctack, 1000);
         initializeStack(xlstack, 1000);
-        initializeStack(pdfStack, 30);
+        initializeStack(pdfStack, 1000);
     }
 
     public static int getNextAvailableIndex(String fileType)

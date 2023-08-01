@@ -21,11 +21,12 @@ public class HwpConverter implements Converter {
     String convertedFileLocation = FileTypeUtils.getConvertedFileLocation(fileType, fileIndex);
     String convertedHwpIndexedFolderLocation = FileTypeUtils.getIndexedFolderLocation(fileType, fileIndex);
     
-    String pythonScript = "C:\\Users\\Zorig\\Desktop\\Work\\hwp2html\\hwp_to_html2.py";
+    String pythonScript = "/var/www/hwp_to_html2.py";
+    //pythonScript = "D:\\SDK\\hwp_to_html2.py";
     
     //This needs to call a python script
     //This python script needs to be bundled together
-    ProcessBuilder processBuilder = new ProcessBuilder("python", pythonScript, uploadedFileLocation);
+    ProcessBuilder processBuilder = new ProcessBuilder("python3", pythonScript, uploadedFileLocation);
     processBuilder.directory(new File(ConverterConstants.CONVERTED_HWP_FOLDER_LOCATION));
     //TODO: change back working directory
     

@@ -57,13 +57,14 @@ public class FileUploadController {
     }
 
     @PostMapping(value = "/upload/compressed", produces = "application/zip")
-    public ResponseEntity<FileSystemResource> convertAndReturnCompressedFiles(@RequestPart("file") MultipartFile file,
+    public ResponseEntity<String> convertAndReturnCompressedFiles(@RequestPart("file") MultipartFile file,
             HttpServletResponse response)
             throws Exception {
         String originalFileName = file.getOriginalFilename();
         if (null == originalFileName) {
             throw new Exception();
         }
+        try{
 
         int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName));
 
@@ -71,23 +72,18 @@ public class FileUploadController {
 
         fileConverterService.convertUploadedFileUsingFactory(originalFileName, fileIndex);
 
-        String zipFileUrl = fileCompressionService.compressFile(originalFileName, fileIndex);
+                    String html = fileCompressionService.retrieveRootHtml(originalFileName, fileIndex);
 
-        // setting headers
-        HttpHeaders headers = new HttpHeaders();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Access-Control-Allow-Private-Network", "false");
+            headers.add("Access-Control-Allow-Origin", "*");
 
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", "test.zip");
-        headers.add("Access-Control-Allow-Private-Network", "false");
-        headers.add("Access-Control-Allow-Origin", "*");
-
-        File zipfile = new File(zipFileUrl);
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(new FileSystemResource(zipfile));
-        // FileVersionManager.releaseIndex(FileTypeUtils.getFileType(originalFileName),
-        // fileIndex);
+            //FileVersionManager.releaseIndex(fileType, fileIndex);
+            return new ResponseEntity<String>(html, headers, 200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<String>("ERROR", null, 500);
+        }
     }
 
     @PostMapping(value = "/upload")
@@ -98,7 +94,7 @@ public class FileUploadController {
         }
 
         try {
-            int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName));
+            int fileIndex = FileVersionManager.getNextAvailableIndex(FileTypeUtils.getFileType(originalFileName).toLowerCase());
 
             fileUploaderService.uploadFile(originalFileName, file.getBytes(), fileIndex);
 
@@ -109,10 +105,6 @@ public class FileUploadController {
             HttpHeaders headers = new HttpHeaders();
             headers.add("Access-Control-Allow-Private-Network", "false");
             headers.add("Access-Control-Allow-Origin", "*");
-
-
-            String fileType = originalFileName.substring(originalFileName.lastIndexOf(".")).replace(".", "");
-          
 
             //FileVersionManager.releaseIndex(fileType, fileIndex);
             return new ResponseEntity<String>(html, headers, 200);
